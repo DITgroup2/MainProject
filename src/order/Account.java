@@ -22,6 +22,7 @@ public class Account {
 		this.totalSales = 0;
 		this.purchaseOrderList = purchaseOrderList;
 		this.supplyOrderList = supplyOrderList;
+		getTotalPurchases();
 	}
 
 	/**

@@ -26,7 +26,6 @@ import retailSystem.PersonDB;
 
 public class MainGUI extends JFrame implements ActionListener {
 
-	private JTabbedPane tabbedPane;
 	private PurchaseOrderTab purchaseOrderTab;
 	private CustomerOrderTab customerOrderTab;
 	private StockControlTab stockControlTab;
@@ -34,19 +33,16 @@ public class MainGUI extends JFrame implements ActionListener {
 	private ProductTab productTab;
 	private SupplierTab supplierTab;
 	private CustomerTab customerTab;
-	private JMenuBar menuBar;
-	private JMenu fileMenu;
-	private JMenu userMenu;
-	private JMenu helpMenu;
-	private JMenuItem logoutMenuItem;
-	private JMenuItem exitMenuItem;
-	private JMenuItem openMenuItem;
-	private JMenuItem saveMenuItem;
-	private JMenuItem aboutMenuItem;
-	private JMenuItem howToMenuItem;
-	private StockDBControl stockDBControl;
 	private Login login;
+
+	private JTabbedPane tabbedPane;
+	private JMenuBar menuBar;
+	private JMenu fileMenu, userMenu, helpMenu;
+	private JMenuItem logoutMenuItem, exitMenuItem, openMenuItem, saveMenuItem, aboutMenuItem,
+			howToMenuItem;
+	private StockDBControl stockDBControl;
 	private JFileChooser fileChooser;
+
 	private File file;
 	private BufferedWriter writer;
 	private StringBuilder stringBuilder;
@@ -89,17 +85,37 @@ public class MainGUI extends JFrame implements ActionListener {
 
 	private JPanel contentPane;
 
+	/**
+	 * Main GUI constructor
+	 * 
+	 * @param personDB
+	 *            Person database
+	 * @param stockDBControl
+	 *            Stock control database
+	 */
+	public MainGUI(PersonDB personDB, StockDBControl stockDBControl) {
+		Login l = new Login(personDB, stockDBControl);
+		l.setVisible(false);
+		new MainGUI(personDB, stockDBControl, l);
+	}
+
+	/**
+	 * Main GUI constructor
+	 * 
+	 * @param personDB
+	 *            Person database
+	 * @param stockDBControl
+	 *            Stock control database
+	 * @param login
+	 *            Login functions
+	 */
 	public MainGUI(PersonDB personDB, StockDBControl stockDBControl, Login login) {
 		Toolkit tk = Toolkit.getDefaultToolkit();
 
+		// Initialise
 		this.login = login;
 		this.stockDBControl = stockDBControl;
 		this.setVisible(true);
-
-		int xSize = ((int) tk.getScreenSize().getWidth());
-		int ySize = ((int) tk.getScreenSize().getHeight());
-		this.setSize(xSize, ySize);
-
 		setLocationRelativeTo(null);
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -108,6 +124,12 @@ public class MainGUI extends JFrame implements ActionListener {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(null);
 
+		// Set the size of the window to full screem
+		int xSize = ((int) tk.getScreenSize().getWidth());
+		int ySize = ((int) tk.getScreenSize().getHeight());
+		this.setSize(xSize, ySize);
+
+		// Set up file choosing functions
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
@@ -155,8 +177,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		supplierTab = new SupplierTab(personDB, tabbedPane, this);
 		staffTab = new StaffTab(personDB);
 		customerTab = new CustomerTab(personDB);
-		productTab = new ProductTab(stockDBControl, personDB, tabbedPane,
-				supplierTab, this);
+		productTab = new ProductTab(stockDBControl, personDB, tabbedPane, supplierTab, this);
 		stockControlTab = new StockControlTab(stockDBControl);
 		customerOrderTab = new CustomerOrderTab(stockDBControl);
 		// purchaseOrderTab = new PurchaseOrderTab(stockDBControl, personDB);
@@ -171,10 +192,9 @@ public class MainGUI extends JFrame implements ActionListener {
 		tabbedPane.addTab("Stock Control", null, stockControlTab, null);
 	}
 
-	// Action events for the different menu items
-	// Note: It's bad practice to do action listeners in this way, even though
-	// it
-	// shortens the code.
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent event) {
 
@@ -182,8 +202,8 @@ public class MainGUI extends JFrame implements ActionListener {
 		if (event.getActionCommand().equals("Exit")) {
 
 			int answer = JOptionPane.showConfirmDialog(null,
-					"Are you sure you want to exit the program?",
-					" CONFIRMATION ", JOptionPane.YES_NO_OPTION);
+					"Are you sure you want to exit the program?", " CONFIRMATION ",
+					JOptionPane.YES_NO_OPTION);
 			if (answer == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
@@ -192,58 +212,75 @@ public class MainGUI extends JFrame implements ActionListener {
 
 		// Logout option
 		if (event.getActionCommand().equals("Logout")) {
+
+			// Hide the main containing window
 			this.setVisible(false);
 			login.clearFields();
 			login.setVisible(true);
 
+			// Close all tabs
 			supplierTab.cancelButton.doClick();
 			staffTab.cancelButton.doClick();
 			customerTab.cancelButton.doClick();
 			productTab.cancelButton.doClick();
-
 			supplierTab.cancelEditButton.doClick();
 			staffTab.cancelEditButton.doClick();
 			customerTab.cancelEditButton.doClick();
 			productTab.cancelEditButton.doClick();
 
+			// Set the default component when login occurs again
 			tabbedPane.setSelectedComponent(customerTab);
 		}
 
-		// About option
+		// User Guide option - Peter
+		if (event.getActionCommand().equals("User Guide")){
+						
+			//File userGuideFile=new File("C:\\Users\\Kruppe\\Desktop\\LIT\\Ericsson\\retailSystem\\userGuide.txt");
+			File userGuideFile = new File("userGuide.txt");
+			try{
+				Runtime.getRuntime().exec("notepad userGuide.txt"); // MainProject/src/guiTabs/userGuide.txt");("notepad C:\\Users\\Kruppe\\Desktop\\LIT\\Ericsson\\retailSystem\\userGuide.txt");
+				}
+				catch(IOException ex){
+				ex.printStackTrace();
+				}
+			
+			// System.out.println("User guide file exists?: " + userGuideFile.exists());
+			// if true, the file exists and can be found
+			
+			// System.out.println("User guide file can be read by the program?: " + userGuideFile.canRead());
+			// if true, the file can be read
+		}
+				
+		// About option - fixed spelling, Peter
 		if (event.getActionCommand().equals("About Group2")) {
-			String message = "DIT FCP-2014 GROUP 2 MEMBERS\n\n"
-					+ "Conor Clarke\n" + "Peter Farrel\n" + "John Fleming\n"
-					+ "Szabolcs Hutvagner\n" + "John O`Keeffe\n"
-					+ "Roland Katona";
+			String message = "DIT FCP-2014 GROUP 2 MEMBERS\n\n" + "Conor Clarke\n"
+					+ "Peter Farrell\n" + "John Fleming\n" + "Szabolcs Hutvagner\n"
+					+ "John O`Keeffe\n" + "Roland Katona";
 			JOptionPane.showMessageDialog(null, message);
 		}
 
-		// About option
+		// Open file option
 		if (event.getActionCommand().equals("Open")) {
 			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 				file = fileChooser.getSelectedFile();
 			}
 		}
 
-		// Save option (need to edit)
+		// Save option
 		if (event.getActionCommand().equals("Save")) {
 			if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				String str = "ERFERERERE";
 				/*
-				 * try(FileWriter fw = new
-				 * FileWriter(fileChooser.getSelectedFile()+".txt")) {
-				 * fw.write(sb.toString()); } catch (IOException e) { //
-				 * Auto-generated catch block e.printStackTrace(); } file =
-				 * fileChooser.getSelectedFile();
+				 * try(FileWriter fw = new FileWriter(fileChooser.getSelectedFile()+".txt")) {
+				 * fw.write(sb.toString()); } catch (IOException e) { // Auto-generated catch block
+				 * e.printStackTrace(); } file = fileChooser.getSelectedFile();
 				 */
 				stringBuilder = new StringBuilder();
-				productTab.buildProductDetailsString(stockDBControl
-						.getStockList());
+				productTab.buildProductDetailsString(stockDBControl.getStockList());
 
 				try {
-					writer = new BufferedWriter(new OutputStreamWriter(
-							new FileOutputStream(fileChooser.getSelectedFile()
-									+ ".txt"), "utf-8"));
+					writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+							fileChooser.getSelectedFile() + ".txt"), "utf-8"));
 					writer.write("Something " + stringBuilder);
 				}
 				catch (IOException e) {
