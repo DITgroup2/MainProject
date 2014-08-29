@@ -179,4 +179,9 @@ public class StockControlTab extends JPanel implements ActionListener, ItemListe
 	public void itemStateChanged(ItemEvent e) {
 		// TODO Auto-generated method stub
 	}
+
+	public void refreshStockControlTab() {
+		// TODO Auto-generated method stub
+
+	}
 }

@@ -15,13 +15,14 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import order.OrderDB;
 import order.StockDBControl;
 import person.Person;
 import person.Staff;
 
 /**
- * Launches a GUI for entering a username and password, with password validation
- * taking place within the Staff class.
+ * Launches a GUI for entering a username and password, with password validation taking place within
+ * the Staff class.
  * 
  * @author Conor Clarke, modified by Roland
  */
@@ -36,14 +37,16 @@ public class Login extends JFrame implements ActionListener {
 	private JTextField usernameField;
 	private JPasswordField passwordField;
 	private MainGUI gui;
+	private OrderDB orderDB;
 
 	/**
 	 * Launches the window for the login screen
 	 */
-	public Login(PersonDB personDB, StockDBControl stockDBControl) {
+	public Login(PersonDB personDB, StockDBControl stockDBControl, OrderDB orderDB) {
 		this.stockDBControl = stockDBControl;
 		this.staffList = personDB.getStaffList();
 		this.personDB = personDB;
+		this.orderDB = orderDB;
 		runLogin();
 		login = false;
 	}
@@ -112,7 +115,7 @@ public class Login extends JFrame implements ActionListener {
 				login = ((Staff) user).passwordValidation(validate);
 				if (login) {
 					if (((Staff) user).getAccessLevel() == 2) {
-						gui = new MainGUI(personDB, stockDBControl, this);
+						gui = new MainGUI((Staff) user, personDB, stockDBControl, this, orderDB);
 						gui.getSupplierTab().enableButtons(true);
 						gui.getCustomerTab().enableButtons(true);
 						gui.getStaffTab().enableButtons(true);

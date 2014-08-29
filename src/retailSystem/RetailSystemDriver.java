@@ -3,6 +3,7 @@ package retailSystem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import order.OrderDB;
 import order.StockDBControl;
 
 public class RetailSystemDriver {
@@ -12,15 +13,16 @@ public class RetailSystemDriver {
 	private static boolean hasAccessLevelSet;
 	private static boolean priviledged;
 	private Product product;
+	private OrderDB orderDB;
 	private static String contactNumPattern = "^[0].[0-9]{8,10}$";
 	private static String accessLevelPattern = "^[1-2]$";
 	private static String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
-	public static final Pattern VALID_CONTACT_NUMBER = Pattern.compile(
-			contactNumPattern, Pattern.CASE_INSENSITIVE);
-	public static final Pattern VALID_ACCESS_LEVEL = Pattern.compile(
-			accessLevelPattern, Pattern.CASE_INSENSITIVE);
-	public static final Pattern VALID_EMAIL_ADDRESS = Pattern.compile(
-			emailPattern, Pattern.CASE_INSENSITIVE);
+	public static final Pattern VALID_CONTACT_NUMBER = Pattern.compile(contactNumPattern,
+			Pattern.CASE_INSENSITIVE);
+	public static final Pattern VALID_ACCESS_LEVEL = Pattern.compile(accessLevelPattern,
+			Pattern.CASE_INSENSITIVE);
+	public static final Pattern VALID_EMAIL_ADDRESS = Pattern.compile(emailPattern,
+			Pattern.CASE_INSENSITIVE);
 
 	public static boolean validateAccessLevel(String alStr) {
 		Matcher matcher = VALID_ACCESS_LEVEL.matcher(alStr);
@@ -48,6 +50,7 @@ public class RetailSystemDriver {
 
 	public RetailSystemDriver() {
 		personDB = new PersonDB();
+		orderDB = new OrderDB();
 
 		personDB.automaticallyCreateStaff();
 		personDB.automaticallyCreateSupplier();
@@ -56,7 +59,7 @@ public class RetailSystemDriver {
 		stockDBControl = new StockDBControl();
 		automaticallyCreateProducts();
 
-		new Login(personDB, stockDBControl);
+		new Login(personDB, stockDBControl, orderDB);
 	}
 
 	private void automaticallyCreateProducts() {

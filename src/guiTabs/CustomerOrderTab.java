@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -13,207 +15,426 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
+import order.Order;
+import order.OrderDB;
 import order.StockDBControl;
 import order.StockItem;
+import person.Customer;
+import person.Person;
+import person.Staff;
+import retailSystem.PersonDB;
 import retailSystem.Product;
 
-public class CustomerOrderTab extends JPanel implements ActionListener, ItemListener {
+public class CustomerOrderTab extends JPanel implements ActionListener, ItemListener,
+		ListSelectionListener {
 
-	private JScrollPane scrollpane;
 	private StockDBControl stockDBControl;
+	private PersonDB personDB;
+	private OrderDB orderDB;
+	private Staff currentlyLoggedInStaff;
+	private StockControlTab stockControlTab;
+	private NumberFormat formatter = new DecimalFormat("#0.00");
+
 	protected Vector<String> comboBoxItems = new Vector<String>();
-	protected ArrayList<Integer> ItemsQuantity = new ArrayList<Integer>();
-	protected ArrayList<Double> ItemsPrice = new ArrayList<Double>();
+	protected ArrayList<Integer> itemsQuantity = new ArrayList<Integer>();
+	protected ArrayList<Double> itemsPrice = new ArrayList<Double>();
 	protected DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<String>(
 			comboBoxItems);
 	protected JComboBox<String> productComboBox = new JComboBox<String>(comboBoxModel);
 
-	protected Vector<String> orderingListItems = new Vector<String>();
+	protected Vector<String> customerComboBoxItems = new Vector<String>();
+	protected DefaultComboBoxModel<String> customerComboBoxModel = new DefaultComboBoxModel<String>(
+			customerComboBoxItems);
+	protected JComboBox<String> customerComboBox = new JComboBox<String>(customerComboBoxModel);
+
 	protected DefaultListModel<String> listModel = new DefaultListModel<String>();
 	protected JList<String> orderingList = new JList<String>(listModel);
+	protected JScrollPane orderingListSroll = new JScrollPane(orderingList);
 
-	// If you use a StockItem object you only need one list here. It has methods
-	// for setting the product and the quantity.
 	protected ArrayList<Product> currentOrderList = new ArrayList<Product>();
 	protected ArrayList<Integer> currentOrderListQuantity = new ArrayList<Integer>();
+	protected ArrayList<Integer> currentOrderComboIndex = new ArrayList<Integer>();
 
 	protected JLabel productComboBoxLabel, quantityLabel, availableQuantityLabel,
-			availableQuantityField, priceLabel, priceField, subtotalLabel, subtotalField;
+			availableQuantityField, priceLabel, priceField, grandTotalLabel, grandTotalField,
+			orderListProductLabel, orderListQtyLabel, orderListPriceLabel,
+			orderListTotalPriceLabel, customerComboBoxLabel, customerIDLabel, customerIDField;
 	protected JTextField quantityTextField;
-	protected JButton addButton;
-	protected double subTotal = 0;
+	protected JButton addButton, removeButton, processButton;
+	protected double grandTotal = 0;
 
-	public CustomerOrderTab(StockDBControl StockDBControl) {
+	private TabListCellRenderer renderer = new TabListCellRenderer();
 
-		this.stockDBControl = StockDBControl;
-		scrollpane = new JScrollPane(orderingList);
+	// source for this class:
+	// http://www.grandt.com/sbe/files/uts2/Chapter10html/Chapter10.htm
 
+	public CustomerOrderTab(Staff currentlyLoggedInStaff, PersonDB personDB,
+			StockDBControl stockDBControl, OrderDB orderDB, StockControlTab stockControlTab) {
+		this.stockControlTab = stockControlTab;
+		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
+		this.orderDB = orderDB;
+		this.personDB = personDB;
+		this.stockDBControl = stockDBControl;
+
+		setUpCustomerComboBox();
 		setUpProductComboBox();
+
+		setUpCustomerNameField();
 		setUpQuantityTextField();
 		setUpAvailableQuantity();
 		setUpPriceFields();
 		setAddButton();
+		setRemoveButton();
+		setProcessButton();
 		setUpSubtotal();
 		orderingList();
+		refreshTab(0);
 
 		setLayout(null);
 		setVisible(true);
 	}
 
-	/**
-	 * Add a drop down list of products
-	 */
+	// add customer combo box
+	private void setUpCustomerComboBox() {
+		customerComboBoxLabel = new JLabel("Customers");
+		customerComboBoxLabel.setBounds(10, 10, 100, 20);
+		add(customerComboBoxLabel);
+		customerComboBox.setBounds(10, 30, 200, 20);
+		add(customerComboBox);
+		fillUpCustomerComboBox();
+		customerComboBox.addItemListener(this);
+	}
+
+	// add product combo box
 	private void setUpProductComboBox() {
 		productComboBoxLabel = new JLabel("Products");
-		productComboBoxLabel.setBounds(60, 10, 100, 20);
-		productComboBox.setBounds(60, 30, 200, 20);
+		productComboBoxLabel.setBounds(10, 70, 100, 20);
+		productComboBox.setBounds(10, 90, 200, 20);
 		add(productComboBoxLabel);
 		add(productComboBox);
-		refreshComboBox(stockDBControl.getStockList());
+		fillUpProductComboBox();
 		productComboBox.addItemListener(this);
 	}
 
-	/**
-	 * Add field to select number of products
-	 */
+	// add customer name field
+	private void setUpCustomerNameField() {
+		customerIDLabel = new JLabel("ID");
+		customerIDLabel.setBounds(220, 10, 50, 20);
+		customerIDField = new JLabel();
+		customerIDField.setBounds(220, 30, 70, 20);
+		add(customerIDLabel);
+		add(customerIDField);
+	}
+
+	// add product quantity field
 	private void setUpQuantityTextField() {
 		quantityLabel = new JLabel("pc(s)");
-		quantityLabel.setBounds(270, 10, 50, 20);
+		quantityLabel.setBounds(220, 70, 50, 20);
 		quantityTextField = new JTextField("1");
-		quantityTextField.setBounds(270, 30, 30, 20);
+		quantityTextField.setBounds(220, 90, 50, 20);
 		add(quantityLabel);
 		add(quantityTextField);
 	}
 
-	/**
-	 * Initialise fields to set the quantity of product available
-	 */
+	// add product available quantity
 	private void setUpAvailableQuantity() {
-		availableQuantityLabel = new JLabel("Available");
-		availableQuantityLabel.setBounds(330, 10, 70, 20);
-
-		availableQuantityField = new JLabel(Integer.toString(ItemsQuantity.get(0)));
-		availableQuantityField.setBounds(340, 30, 40, 20);
+		availableQuantityLabel = new JLabel("AvQ");
+		availableQuantityLabel.setBounds(300, 70, 40, 20);
+		availableQuantityField = new JLabel(Integer.toString(itemsQuantity.get(0)));
+		availableQuantityField.setBounds(300, 90, 40, 20);
 		add(availableQuantityLabel);
 		add(availableQuantityField);
 	}
 
-	/**
-	 * Add product price fields
-	 */
+	// add product price fields
 	private void setUpPriceFields() {
 		priceLabel = new JLabel("Price");
-		priceLabel.setBounds(400, 10, 40, 20);
-		priceField = new JLabel(Double.toString(ItemsPrice.get(0)));
-		priceField.setBounds(400, 30, 40, 20);
+		priceLabel.setBounds(350, 70, 40, 20);
+		priceField = new JLabel(formatter.format(itemsPrice.get(0)));
+		priceField.setBounds(350, 90, 50, 20);
 		add(priceLabel);
 		add(priceField);
 	}
 
-	/**
-	 * Add Sub total price fields
-	 */
+	// add Grand Total price fields
 	private void setUpSubtotal() {
-		subtotalLabel = new JLabel("Total:");
-		subtotalLabel.setBounds(290, 300, 50, 20);
-		subtotalField = new JLabel("0");
-		subtotalField.setBounds(350, 300, 80, 20);
-		add(subtotalLabel);
-		add(subtotalField);
+		grandTotalLabel = new JLabel("Grand Total:");
+		grandTotalLabel.setBounds(280, 300, 70, 20);
+		grandTotalField = new JLabel("0.00");
+		grandTotalField.setBounds(335, 300, 70, 20);
+
+		grandTotalField.setHorizontalAlignment(JLabel.RIGHT);
+		add(grandTotalLabel);
+		add(grandTotalField);
 	}
 
-	/**
-	 * Set up an add button
-	 */
+	// add add button
 	private void setAddButton() {
 		addButton = new JButton("Add");
-		addButton.setBounds(60, 60, 60, 20);
+		addButton.setBounds(220, 120, 60, 20);
 		addButton.addActionListener(this);
 		add(addButton);
 	}
 
-	/**
-	 * Add scrollable text field for the ordering list
-	 */
+	// add remove button
+	private void setRemoveButton() {
+		removeButton = new JButton("Remove");
+		removeButton.setBounds(150, 300, 100, 20);
+		removeButton.addActionListener(this);
+		add(removeButton);
+		removeButton.setEnabled(false);
+	}
+
+	// add process button
+	private void setProcessButton() {
+		processButton = new JButton("Process");
+		processButton.setBounds(290, 325, 100, 20);
+		processButton.addActionListener(this);
+		add(processButton);
+		processButton.setEnabled(false);
+	}
+
+	// add buying list
 	private void orderingList() {
-		scrollpane.setBounds(60, 100, 410, 180);
-		add(scrollpane);
+		orderListProductLabel = new JLabel("Product name");
+		orderListProductLabel.setBounds(10, 150, 80, 20);
+		orderListQtyLabel = new JLabel("Qty");
+		orderListQtyLabel.setBounds(225, 150, 30, 20);
+		orderListPriceLabel = new JLabel("Price");
+		orderListPriceLabel.setBounds(290, 150, 50, 20);
+		orderListTotalPriceLabel = new JLabel("Total");
+		orderListTotalPriceLabel.setBounds(370, 150, 50, 20);
+		add(orderListProductLabel);
+		add(orderListQtyLabel);
+		add(orderListPriceLabel);
+		add(orderListTotalPriceLabel);
+
+		orderingList.addListSelectionListener(this);
+		orderingListSroll.setBounds(10, 170, 420, 120);
+
+		add(orderingListSroll);
+
+		renderer.setTabs(new int[] { 230, 315, 395 });
+		orderingList.setCellRenderer(renderer);
 	}
 
-	/**
-	 * Refreshes combo Box for price and quantity
-	 * 
-	 * @param oList
-	 *            The order list
-	 */
-	private void refreshComboBox(ArrayList<StockItem> oList) {
-		// ha még egyszer le akarjuk futtatni, akkor itt ki kell kapcsolni a
-		// combo listener-jént
-		// és a mûvelet után visszakapcsolni!!! Hogy hogyan, nem tudom...
-		comboBoxItems.clear();
-		ItemsQuantity.clear();
-		ItemsPrice.clear();
-		for (StockItem stockItem : oList) {
-			comboBoxItems.add(stockItem.getProduct().getProductName());
-			ItemsQuantity.add(stockItem.getQuantity());
-			ItemsPrice.add(stockItem.getProduct().getRetailPrice());
+	// fill up customer combo Box
+	public void fillUpCustomerComboBox() {
+		ArrayList<Person> customers = personDB.getCustomerList();
+		customerComboBoxItems.clear();
+		// customerComboBoxItems.add(">> ADD NEW CUSTOMER <<");
+		for (Person customer : customers) {
+			customerComboBoxItems.add(customer.getName());
 		}
-		productComboBox.setSelectedIndex(0);
+		customerComboBox.setSelectedIndex(customers.size() - 1);
 	}
 
-	/**
-	 * Refreshes the Tab
-	 * 
-	 * @param index
-	 */
+	// fill up product combo Box with price and quantity
+	private void fillUpProductComboBox() {
+		ArrayList<StockItem> list = stockDBControl.getStockList();
+		comboBoxItems.clear();
+		itemsQuantity.clear();
+		itemsPrice.clear();
+		for (StockItem stockItem : list) {
+			comboBoxItems.add(stockItem.getProduct().getProductName());
+			itemsPrice.add(stockItem.getProduct().getRetailPrice());
+			itemsQuantity.add(stockItem.getQuantity());
+		}
+		productComboBox.setSelectedIndex(list.size() - 1);
+	}
+
+	// refresh Tab
 	private void refreshTab(int index) {
-		availableQuantityField.setText(Integer.toString(ItemsQuantity.get(index)));
-		priceField.setText(Double.toString(ItemsPrice.get(index)));
+		priceField.setText(formatter.format(itemsPrice.get(index)));
 		quantityTextField.setText("1");
+		availableQuantityField.setText(Integer.toString(itemsQuantity.get(index)));
+		grandTotalField.setText(formatter.format(grandTotal));
+		productComboBox.setSelectedIndex(index);
+		customerIDField.setText(Integer.toString(personDB.getCustomerList().get(
+				(customerComboBox.getSelectedIndex())).getId()));
 	}
 
-	/**
-	 * Event listener for the combo box. The combo box selects the produc to add to the order.
-	 */
+	private String textAlignment(String text1, String text2, String text3, String text4) {
+		String s = text1;
+		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
+		return s;
+	}
+
+	// combo box selection
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {
 			refreshTab(productComboBox.getSelectedIndex());
+		}
 
+	}
+
+	// button actions
+	@Override
+	public void actionPerformed(ActionEvent e) {
+
+		// ADD BUTTON
+		if (e.getSource() == addButton) {
+
+			// add product and quantity to the current order list
+			int index = productComboBox.getSelectedIndex();
+
+			Product selectedProduct = stockDBControl.getStockList().get(index).getProduct();
+
+			int availableQuantity = itemsQuantity.get(index);
+
+			// accepting only integer into quantityTextField
+			try {
+				int orderingQuantity = (Integer.parseInt(quantityTextField.getText()));
+
+				if (orderingQuantity > 0) {
+
+					// check if there is enough product available to buy
+					if (orderingQuantity <= availableQuantity) {
+						processButton.setEnabled(true);
+						// set available quantity
+						itemsQuantity.set(index, availableQuantity - orderingQuantity);
+
+						// refresh subtotal price
+						grandTotal += (selectedProduct.getRetailPrice() * orderingQuantity);
+
+						// check if the selected product is already in the currentOrderList
+						int orderListIndex = currentOrderList.indexOf(selectedProduct);
+						if (orderListIndex >= 0) {
+							orderingQuantity += currentOrderListQuantity.get(orderListIndex);
+							currentOrderListQuantity.set(orderListIndex, orderingQuantity);
+							listModel.setElementAt(textAlignment(comboBoxItems.get(index), Integer
+									.toString(orderingQuantity), priceField.getText(), formatter
+									.format(orderingQuantity * selectedProduct.getRetailPrice())),
+									orderListIndex);
+							orderingList.setSelectedIndex(orderListIndex);
+						}
+						// selected product is NOT on the currntOrderList
+						else {
+							currentOrderList.add(selectedProduct);
+							currentOrderListQuantity.add(orderingQuantity);
+							listModel.addElement(textAlignment(comboBoxItems.get(index),
+									quantityTextField.getText(), priceField.getText(), formatter
+											.format(orderingQuantity
+													* selectedProduct.getRetailPrice())));
+							orderingList.setSelectedIndex(listModel.getSize() - 1);
+						}
+
+						removeButton.setEnabled(true);
+						refreshTab(index);
+					}
+					else
+						JOptionPane.showMessageDialog(null, "Not enough product in stock!");
+				}
+				else
+					JOptionPane.showMessageDialog(null,
+							"Product quantity must by positive whole number");
+
+			}
+			catch (NumberFormatException error) {
+				JOptionPane.showMessageDialog(null,
+						"Invalid entry, only positive whole numbers please!");
+				// error.printStackTrace();
+			}
+		}
+
+		// REMOVE BUTTON
+		if (e.getSource() == removeButton) {
+			int index = orderingList.getSelectedIndex();
+			int i = 0; // index in combo list or stock list
+
+			for (StockItem stockItem : stockDBControl.getStockList()) {
+				if (stockItem.getProduct().getProductID() == currentOrderList.get(index)
+						.getProductID()) {
+					break;
+				}
+				i++;
+			}
+
+			grandTotal -= (currentOrderList.get(index).getRetailPrice() * currentOrderListQuantity
+					.get(index));
+			itemsQuantity.set(i, itemsQuantity.get(i) + currentOrderListQuantity.get(index));
+			currentOrderList.remove(index);
+			currentOrderListQuantity.remove(index);
+			listModel.remove(index);
+
+			if (listModel.isEmpty()) {
+				removeButton.setEnabled(false);
+				processButton.setEnabled(false);
+			}
+			if (index != 0)
+				orderingList.setSelectedIndex(index - 1);
+			else
+				orderingList.setSelectedIndex(0);
+
+			refreshTab(i);
+		}
+
+		// PROCESS BUTTON
+		if (e.getSource() == processButton) {
+
+			// make new stock list, fill the elements from the chosen product and quantities
+			StockItem orderStockItem = new StockItem();
+			ArrayList<StockItem> orderStockItemList = new ArrayList<StockItem>();
+
+			for (int i = 0; i < currentOrderList.size(); i++) {
+				orderStockItem.setProduct(currentOrderList.get(i));
+				orderStockItem.setQuantity(currentOrderListQuantity.get(i));
+				orderStockItemList.add(orderStockItem);
+			}
+			Customer customer = (Customer) personDB.getCustomerList().get(
+					customerComboBox.getSelectedIndex());
+			// Staff responsibleStaffForOrder = (Staff)personDB.getStaffList().get(0);
+
+			// make a new order and put it to the orderDB
+			Order order = new Order(currentlyLoggedInStaff, customer, orderStockItemList,
+					grandTotal);
+			orderDB.getCustomerOrderList().add(order);
+
+			// reduce the products' quantity in stockDBControl
+			int quantity;
+			for (int index = 0; index < currentOrderList.size(); index++) {
+				quantity = stockDBControl.getStockItem(currentOrderList.get(index).getProductID())
+						.getQuantity();
+				quantity -= currentOrderListQuantity.get(index);
+				stockDBControl.getStockItem(currentOrderList.get(index).getProductID())
+						.setQuantity(quantity);
+			}
+
+			JOptionPane.showMessageDialog(null, "Order created by "
+					+ currentlyLoggedInStaff.getName() + "\n  for " + customer.getName()
+					+ "\n Grand Total price: " + grandTotal);
+
+			// clear the tab and refresh
+			listModel.clear();
+			currentOrderList.clear();
+			currentOrderListQuantity.clear();
+			grandTotal = 0;
+			removeButton.setEnabled(false);
+			processButton.setEnabled(false);
+			fillUpCustomerComboBox();
+			fillUpProductComboBox();
+			refreshTab(0);
+			stockControlTab.refreshStockControlTab();
+
+			// TESTING - reading back from the orderDB
+			// System.out.println(orderDB.getCustomerOrderList().get(0).getOrderEntryList().get(0).getProduct().getProductName());
+			// System.out.println(orderDB.getCustomerOrderList().get(0).getOrderEntryList().size());
 		}
 	}
 
-	/**
-	 * Action listeners
-	 */
+	// list selection event
 	@Override
-	public void actionPerformed(ActionEvent e) {
-		// If the add button has been clicked
-		if (e.getSource() == addButton) {
-
-			// Add product and quantity to the current order list
-			Product tempProduct = stockDBControl.getStockList().get(
-					productComboBox.getSelectedIndex()).getProduct();
-			int tempQuantity = (Integer.parseInt(quantityTextField.getText()));
-			currentOrderList.add(tempProduct);
-			currentOrderListQuantity.add(tempQuantity);
-
-			// Display the above in a text field
-			orderingListItems.add(comboBoxItems.get(productComboBox.getSelectedIndex()));
-			listModel.addElement(comboBoxItems.get(productComboBox.getSelectedIndex())
-					+ "\t\t   "
-					+ quantityTextField.getText()
-					+ " \t\t  "
-					+ ((Double.parseDouble(priceField.getText()) * (Double
-							.parseDouble(quantityTextField.getText())))));
-
-			// Calculate the running total for the order price
-			subTotal += (tempProduct.getRetailPrice() * tempQuantity);
-			subtotalField.setText(Double.toString(subTotal));
+	public void valueChanged(ListSelectionEvent e) {
+		if (e.getSource() == orderingList) {
+			removeButton.setEnabled(true);
 		}
 	}
 }

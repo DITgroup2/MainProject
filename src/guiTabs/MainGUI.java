@@ -22,7 +22,9 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.border.EmptyBorder;
 
+import order.OrderDB;
 import order.StockDBControl;
+import person.Staff;
 import retailSystem.Login;
 import retailSystem.PersonDB;
 
@@ -36,6 +38,8 @@ public class MainGUI extends JFrame implements ActionListener {
 	private SupplierTab supplierTab;
 	private CustomerTab customerTab;
 	private Login login;
+	private Staff currentlyLoggedInStaff;
+	private OrderDB orderDB;
 
 	private JTabbedPane tabbedPane;
 	private JMenuBar menuBar;
@@ -96,9 +100,16 @@ public class MainGUI extends JFrame implements ActionListener {
 	 *            Stock control database
 	 */
 	public MainGUI(PersonDB personDB, StockDBControl stockDBControl) {
-		Login l = new Login(personDB, stockDBControl);
+		Login l = new Login(personDB, stockDBControl, orderDB);
 		l.setVisible(false);
 		new MainGUI(personDB, stockDBControl, l);
+	}
+
+	public MainGUI(Staff currentlyLoggedInStaff, PersonDB personDB, StockDBControl stockDBControl,
+			Login login, OrderDB orderDB) {
+		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
+		this.orderDB = orderDB;
+		new MainGUI(personDB, stockDBControl, login);
 	}
 
 	/**
@@ -182,7 +193,8 @@ public class MainGUI extends JFrame implements ActionListener {
 		customerTab = new CustomerTab(personDB);
 		productTab = new ProductTab(stockDBControl, personDB, tabbedPane, supplierTab, this);
 		stockControlTab = new StockControlTab(stockDBControl);
-		customerOrderTab = new CustomerOrderTab(stockDBControl);
+		customerOrderTab = new CustomerOrderTab(currentlyLoggedInStaff, personDB, stockDBControl,
+				orderDB, stockControlTab);
 		// purchaseOrderTab = new PurchaseOrderTab(stockDBControl, personDB);
 
 		// Add the tabs to the pane
