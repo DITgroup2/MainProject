@@ -296,10 +296,11 @@ public class StaffTab extends PersonTab {
 
 		// Cancel button clicked
 		if (e.getSource() == cancelButton) {
-
 			setFieldEditable(false);
 			togglePasswordField();
 			setTextField(personDB.getStaffList().size() - 1, personDB.getStaffList());
+			accessLevelLabel.setForeground(Color.black);
+
 			if (!(personDB.getStaffList().size() > 0))
 				clearTextFields(personDB.getStaffList());
 		}
@@ -309,6 +310,8 @@ public class StaffTab extends PersonTab {
 			setTextField(comboBox.getSelectedIndex(), personDB.getStaffList());
 			setFieldEditable(false);
 			togglePasswordField();
+			accessLevelLabel.setForeground(Color.black);
+
 			if (!(personDB.getStaffList().size() > 0))
 				clearTextFields(personDB.getStaffList());
 		}

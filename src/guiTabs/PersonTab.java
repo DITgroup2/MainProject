@@ -403,6 +403,11 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener {
 			newPersonButton.setEnabled(true);
 			editPersonButton.setEnabled(true);
 			editPersonButton.setVisible(true);
+
+			nameLabel.setForeground(Color.black);
+			emailLabel.setForeground(Color.black);
+			addressLabel.setForeground(Color.black);
+			contactNumberLabel.setForeground(Color.black);
 		}
 
 		// Refresh the view

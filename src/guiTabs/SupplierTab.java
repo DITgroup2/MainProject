@@ -239,6 +239,9 @@ public class SupplierTab extends PersonTab {
 		if (e.getSource() == cancelButton) {
 			setFieldEditable(false);
 			setTextField(personDB.getSupplierList().size() - 1, personDB.getSupplierList());
+			contactNameLabel.setForeground(Color.black);
+			vatNumberLabel.setForeground(Color.black);
+
 			if (!(personDB.getSupplierList().size() > 0))
 				clearTextFields(personDB.getSupplierList());
 		}
@@ -247,6 +250,9 @@ public class SupplierTab extends PersonTab {
 		if (e.getSource() == cancelEditButton) {
 			setTextField(comboBox.getSelectedIndex(), personDB.getSupplierList());
 			setFieldEditable(false);
+			contactNameLabel.setForeground(Color.black);
+			vatNumberLabel.setForeground(Color.black);
+
 			if (!(personDB.getSupplierList().size() > 0))
 				clearTextFields(personDB.getSupplierList());
 		}

@@ -115,6 +115,8 @@ public class Login extends JFrame implements ActionListener {
 				login = ((Staff) user).passwordValidation(validate);
 				if (login) {
 					if (((Staff) user).getAccessLevel() == 2) {
+						this.dispose();
+						JOptionPane.showMessageDialog(null, "Login successful!");
 						gui = new MainGUI((Staff) user, personDB, stockDBControl, this, orderDB);
 						gui.getSupplierTab().enableButtons(true);
 						gui.getCustomerTab().enableButtons(true);
@@ -122,21 +124,22 @@ public class Login extends JFrame implements ActionListener {
 						gui.getProductTab().enableButtons(true);
 						RetailSystemDriver.setPriviledged(true);
 						gui.setVisible(true);
-						setVisible(false);
+						this.setVisible(false);
 					}
 					else {
+						this.dispose();
+						JOptionPane.showMessageDialog(null, "Login successful!");
 						gui = new MainGUI(personDB, stockDBControl, this);
 						gui.getSupplierTab().enableButtons(false);
 						gui.getCustomerTab().enableButtons(false);
 						gui.getStaffTab().enableButtons(false);
 						gui.getProductTab().enableButtons(false);
 						RetailSystemDriver.setPriviledged(false);
-						gui.setVisible(true);
-						setVisible(false);
+						this.setVisible(false);
 					}
 
 					setVisible(false);
-					JOptionPane.showMessageDialog(null, "Login successful!");
+					gui.setVisible(true);
 				}
 				else
 					JOptionPane.showMessageDialog(null, "Wrong Password!");
@@ -144,5 +147,9 @@ public class Login extends JFrame implements ActionListener {
 			else
 				JOptionPane.showMessageDialog(null, "Invalid username!");
 		}
+	}
+
+	public void submit() {
+		btnNewButton.doClick();
 	}
 }

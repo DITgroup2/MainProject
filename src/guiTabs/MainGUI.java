@@ -1,10 +1,13 @@
 package guiTabs;
 
 import java.awt.Desktop;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +23,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import order.OrderDB;
@@ -40,6 +45,7 @@ public class MainGUI extends JFrame implements ActionListener {
 	private Login login;
 	private Staff currentlyLoggedInStaff;
 	private OrderDB orderDB;
+	private PersonDB personDB;
 
 	private JTabbedPane tabbedPane;
 	private JMenuBar menuBar;
@@ -109,6 +115,7 @@ public class MainGUI extends JFrame implements ActionListener {
 			Login login, OrderDB orderDB) {
 		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
 		this.orderDB = orderDB;
+		this.personDB = personDB;
 		new MainGUI(personDB, stockDBControl, login);
 	}
 
@@ -124,7 +131,27 @@ public class MainGUI extends JFrame implements ActionListener {
 	 */
 	public MainGUI(PersonDB personDB, StockDBControl stockDBControl, Login login) {
 		Toolkit tk = Toolkit.getDefaultToolkit();
-
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+		catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Rectangle bounds = ge.getMaximumWindowBounds();
 		// Initialise
 		this.login = login;
 		this.stockDBControl = stockDBControl;
@@ -184,7 +211,9 @@ public class MainGUI extends JFrame implements ActionListener {
 		// Set up a tabbed pane system
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.setBackground(SystemColor.window);
-		tabbedPane.setBounds(10, 10, xSize, ySize);
+		this.setBounds(0, 0, xSize, xSize - 50);
+		tabbedPane.setBounds(0, 0, this.getWidth() - 5, this.getHeight() - 5);
+
 		contentPane.add(tabbedPane);
 
 		// Set up the tabs, passing in the relevant data structures
@@ -315,6 +344,12 @@ public class MainGUI extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Opens the user guide in the default web browser
+	 * 
+	 * @param urlString
+	 *            The path to the user guide
+	 */
 	public static void openWebpage(String urlString) {
 		try {
 			File htmlFile = new File(urlString);
@@ -323,5 +358,10 @@ public class MainGUI extends JFrame implements ActionListener {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void keyTyped(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ENTER)
+			login.submit();
 	}
 }
