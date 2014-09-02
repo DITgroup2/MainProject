@@ -1,4 +1,12 @@
+/**
+ * 
+ */
 package guiTabs;
+
+/**
+ * @author roland
+ *
+ */
 
 import java.awt.Color;
 import java.awt.Font;
@@ -12,7 +20,6 @@ import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -34,21 +41,20 @@ import order.Order;
 import order.OrderDB;
 import order.StockDBControl;
 import order.StockItem;
-import person.Customer;
 import person.Person;
 import person.Staff;
 import person.Supplier;
 import retailSystem.PersonDB;
 import retailSystem.Product;
 
-public class CustomerOrderTab extends JPanel implements ActionListener, ItemListener,
+public class SupplyOrderTab extends JPanel implements ActionListener, ItemListener,
 		ListSelectionListener, ComponentListener {
 
 	ArrayList<StockItem> orderStockItemList;
 	ArrayList<ArrayList<Product>> productList;
 	private Supplier supplier;
-	private Customer customer;
-	private Random random;
+	private Supplier customer;
+
 	private MainGUI gui;
 	private StockDBControl stockDBControl;
 	private PersonDB personDB;
@@ -64,10 +70,10 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 			comboBoxItems);
 	protected JComboBox<String> productComboBox = new JComboBox<String>(comboBoxModel);
 
-	protected Vector<String> customerComboBoxItems = new Vector<String>();
-	protected DefaultComboBoxModel<String> customerComboBoxModel = new DefaultComboBoxModel<String>(
-			customerComboBoxItems);
-	protected JComboBox<String> customerComboBox = new JComboBox<String>(customerComboBoxModel);
+	protected Vector<String> supplierComboBoxItems = new Vector<String>();
+	protected DefaultComboBoxModel<String> supplierComboBoxModel = new DefaultComboBoxModel<String>(
+			supplierComboBoxItems);
+	protected JComboBox<String> supplierComboBox = new JComboBox<String>(supplierComboBoxModel);
 
 	protected DefaultListModel<String> listModel = new DefaultListModel<String>();
 	protected JList<String> orderingList = new JList<String>(listModel);
@@ -81,7 +87,7 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 	protected JLabel productComboBoxLabel, quantityLabel, availableQuantityLabel,
 			availableQuantityField, priceLabel, priceField, grandTotalLabel, grandTotalField,
 			orderListProductLabel, orderListQtyLabel, orderListPriceLabel,
-			orderListTotalPriceLabel, customerComboBoxLabel, customerIDLabel, customerIDField;
+			orderListTotalPriceLabel, supplierComboBoxLabel, supplierIDLabel, supplierIDField;
 	protected JTextField quantityTextField;
 	protected JButton addButton, removeButton, processButton, cancelButton;
 	protected double grandTotal = 0;
@@ -95,8 +101,9 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 	private int ySize;
 	private int xPosition;
 	private int yPosition;
+	private boolean selected;
 
-	public CustomerOrderTab(Staff currentlyLoggedInStaff, PersonDB personDB,
+	public SupplyOrderTab(Staff currentlyLoggedInStaff, PersonDB personDB,
 			StockDBControl stockDBControl, OrderDB orderDB, MainGUI gui) {
 
 		this.gui = gui;
@@ -113,15 +120,16 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 		outerPanel = new JPanel();
 		outerPanel.setLayout(null);
 		outerPanel.add(mainPanel);
+		selected = false;
 		outerPanel.setBorder(BorderFactory.createLineBorder(new Color(176, 168, 168), 8, true));
 		this.setBorder(BorderFactory.createLineBorder(new Color(176, 168, 168), 4));
 		add(outerPanel, new GridBagConstraints());
 		addComponentListener(this);
 
-		setUpCustomerComboBox();
+		setUpSupplierComboBox();
 		setUpProductComboBox();
 
-		setUpCustomerNameField();
+		setUpSupplierNameField();
 		setUpQuantityTextField();
 		setUpAvailableQuantity();
 		setUpPriceFields();
@@ -135,37 +143,21 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 
 		setLayout(null);
 		setVisible(true);
-
-		random = new Random();
-		automaticallyCreateOrders();
-		showOrders();
 	}
 
 	public OrderDB getOrderDB() {
 		return orderDB;
 	}
 
-	/*
-	 * idNumberLabel.setBounds(); nameField.setBounds(); nameField.setColumns(10);
-	 * categoryField.setBounds(); categoryField.setColumns(10); supplierField.setBounds(200, 135,
-	 * 265, 20); supplierPriceField.setBounds(200, 160, 265, 20); retailPriceField.setBounds(200,
-	 * 185, 265, 20); profitMarginField.setBounds(200, 210, 265, 20);
-	 * 
-	 * idLabel.setBounds(); nameLabel.setBounds(); categoryLabel.setBounds();
-	 * descriptionLabel.setBounds(); supplierLabel.setBounds(59, 136, 93, 14);
-	 * supplierPriceLabel.setBounds(59, 161, 93, 14); retailPriceLabel.setBounds(59, 186, 93, 14);
-	 * profitMarginLabel.setBounds(59, 211, 93, 14);
-	 */
-
 	// add customer combo box
-	private void setUpCustomerComboBox() {
-		customerComboBoxLabel = new JLabel("Customers");
-		customerComboBoxLabel.setBounds(59, 33, 93, 20);
-		mainPanel.add(customerComboBoxLabel);
-		customerComboBox.setBounds(200, 30, 265, 23);
-		mainPanel.add(customerComboBox);
-		fillUpCustomerComboBox();
-		customerComboBox.addItemListener(this);
+	private void setUpSupplierComboBox() {
+		supplierComboBoxLabel = new JLabel("Suppliers");
+		supplierComboBoxLabel.setBounds(59, 33, 93, 20);
+		mainPanel.add(supplierComboBoxLabel);
+		supplierComboBox.setBounds(200, 30, 265, 23);
+		mainPanel.add(supplierComboBox);
+		fillUpSupplierComboBox();
+		supplierComboBox.addItemListener(this);
 	}
 
 	// add product combo box
@@ -180,13 +172,13 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 	}
 
 	// add customer name field
-	private void setUpCustomerNameField() {
-		customerIDLabel = new JLabel("Customer ID");
-		customerIDLabel.setBounds(59, 10, 93, 20);
-		customerIDField = new JLabel();
-		customerIDField.setBounds(203, 7, 265, 23);
-		mainPanel.add(customerIDLabel);
-		mainPanel.add(customerIDField);
+	private void setUpSupplierNameField() {
+		supplierIDLabel = new JLabel("Supplier ID");
+		supplierIDLabel.setBounds(59, 10, 93, 20);
+		supplierIDField = new JLabel();
+		supplierIDField.setBounds(203, 7, 265, 23);
+		mainPanel.add(supplierIDLabel);
+		mainPanel.add(supplierIDField);
 	}
 
 	// add product quantity field
@@ -201,10 +193,14 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 
 	// add product available quantity
 	private void setUpAvailableQuantity() {
-		availableQuantityLabel = new JLabel("Available");
-		availableQuantityLabel.setBounds(59, 83, 93, 14);
-		availableQuantityField = new JLabel(Integer.toString(itemsQuantity.get(0)));
-		availableQuantityField.setBounds(200, 83, 93, 14);
+		availableQuantityLabel = new JLabel("Quantity in Stock");
+		availableQuantityLabel.setBounds(59, 83, 140, 20);
+		int quantity = 0;
+		if (itemsQuantity.size() > 0) {
+			quantity = itemsQuantity.get(0);
+		}
+		availableQuantityField = new JLabel(Integer.toString(quantity));
+		availableQuantityField.setBounds(200, 83, 93, 20);
 		mainPanel.add(availableQuantityLabel);
 		mainPanel.add(availableQuantityField);
 	}
@@ -213,7 +209,11 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 	private void setUpPriceFields() {
 		priceLabel = new JLabel("Unit Price");
 		priceLabel.setBounds(59, 108, 93, 14);
-		priceField = new JLabel(formatter.format(itemsPrice.get(0)));
+		double price = 0;
+		if (itemsPrice.size() > 0) {
+			price = itemsPrice.get(0);
+		}
+		priceField = new JLabel(formatter.format(price));
 		priceField.setBounds(200, 108, 93, 14);
 		mainPanel.add(priceLabel);
 		mainPanel.add(priceField);
@@ -292,21 +292,22 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 		orderingList.setCellRenderer(renderer);
 	}
 
-	public JComboBox<String> getCustomerComboBox() {
-		return customerComboBox;
+	public JComboBox<String> getSupplierComboBox() {
+		return supplierComboBox;
 	}
 
 	// fill up customer combo Box
-	public void fillUpCustomerComboBox() {
-		ArrayList<Person> customers = personDB.getCustomerList();
-		customerComboBoxItems.clear();
-		customerComboBoxItems.add("<html><font color='red'>Add New Customer</font></html>");
+	public void fillUpSupplierComboBox() {
+
+		supplierComboBoxItems.clear();
+		supplierComboBoxItems.add("<html><font color='red'>Select Supplier</font></html>");
+
+		ArrayList<Person> customers = personDB.getSupplierList();
 		for (Person customer : customers) {
-			customerComboBoxItems.add(customer.getName());
+			supplierComboBoxItems.add(customer.getName());
 		}
-		customerComboBox.setSelectedIndex(customers.size() - 1);
-		validate();
-		repaint();
+		supplierComboBox.setSelectedIndex(customers.size() - 1);
+
 	}
 
 	// fill up product combo Box with price and quantity
@@ -316,50 +317,45 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 		itemsQuantity.clear();
 		itemsPrice.clear();
 		for (StockItem stockItem : list) {
-			comboBoxItems.add(stockItem.getProduct().getProductName());
-			itemsPrice.add(stockItem.getProduct().getRetailPrice());
-			itemsQuantity.add(stockItem.getQuantity());
+			System.out.println(supplierComboBox.getSelectedItem());
+			if (stockItem.getProduct().getSupplier().getName().equals(
+					supplierComboBox.getSelectedItem())) {
+				comboBoxItems.add(stockItem.getProduct().getProductName());
+				itemsPrice.add(stockItem.getProduct().getSupplierPrice());
+				itemsQuantity.add(stockItem.getQuantity());
+			}
 		}
-		productComboBox.setSelectedIndex(list.size() - 1);
+		productComboBox.setSelectedIndex(comboBoxItems.size() - 1);
 	}
 
 	// refresh Tab
 	private void refreshTab(int index) {
-		priceField.setText(formatter.format(itemsPrice.get(index)));
-		quantityTextField.setText("1");
-		availableQuantityField.setText(Integer.toString(itemsQuantity.get(index)));
-		grandTotalField.setText(formatter.format(grandTotal));
-		productComboBox.setSelectedIndex(index);
-		if (customerComboBox.getSelectedIndex() != 0) {
-			customerIDField.setText(Integer.toString(personDB.getCustomerList().get(
-					(customerComboBox.getSelectedIndex() - 1)).getId()));
-		}
-	}
+		if (index > -1) {
+			if (itemsPrice.size() > 0)
+				priceField.setText(formatter.format(itemsPrice.get(index)));
+			quantityTextField.setText("1");
+			if (itemsQuantity.size() > 0) {
+				availableQuantityField.setText(Integer.toString(itemsQuantity.get(index)));
+				grandTotalField.setText(formatter.format(grandTotal));
+				productComboBox.setSelectedIndex(index);
 
-	private String textAlignment(String text1, String text2, String text3, String text4) {
-		String s = text1;
-		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
-		return s;
+				if (supplierComboBox.getSelectedIndex() != 0) {
+					supplierIDField.setText(Integer.toString(personDB.getSupplierList().get(
+							(supplierComboBox.getSelectedIndex() - 1)).getId()));
+				}
+			}
+		}
 	}
 
 	// combo box selection
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {
-			refreshTab(productComboBox.getSelectedIndex());
-		}
-		if (event.getItemSelectable().equals(customerComboBox)) {
-			if (customerComboBox.getItemAt((customerComboBox.getSelectedIndex())).equals(
-					"<html><font color='red'>Add New Customer</font></html>")) {
-				gui.getTabbedPane().setSelectedComponent(gui.getCustomerTab());
-				gui.getCustomerTab().getNewCustomerButton().doClick();
+			if (event.getItemSelectable().equals(supplierComboBox)) {
+				fillUpProductComboBox();
+				refreshTab(productComboBox.getSelectedIndex());
 			}
-			/*
-			 * else customer = personDB.getSupplierByName(supplierComboBox
-			 * .getItemAt(supplierComboBox.getSelectedIndex()));
-			 */
 		}
-
 	}
 
 	// button actions
@@ -416,7 +412,7 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 							scrollBar.setValue(scrollBar.getMaximum());
 							orderingList.setSelectedIndex(listModel.getSize() - 1);
 						}
-
+						supplierComboBox.setEnabled(false);
 						removeButton.setEnabled(true);
 						cancelButton.setEnabled(true);
 						refreshTab(index);
@@ -498,6 +494,7 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 				// error.printStackTrace();
 			}
 			if (listModel.isEmpty()) {
+				supplierComboBox.setEnabled(true);
 				removeButton.setEnabled(false);
 				processButton.setEnabled(false);
 				cancelButton.setEnabled(false);
@@ -518,24 +515,24 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 				orderStockItem.setQuantity(currentOrderListQuantity.get(i));
 				orderStockItemList.add(orderStockItem);
 			}
-			Customer customer = (Customer) personDB.getCustomerList().get(
-					customerComboBox.getSelectedIndex() - 1);
+			Supplier customer = (Supplier) personDB.getSupplierList().get(
+					supplierComboBox.getSelectedIndex() - 1);
 
 			// Staff responsibleStaffForOrder = (Staff)personDB.getStaffList().get(0);
 
 			// make a new order and put it to the orderDB
 			Order order = new Order(currentlyLoggedInStaff, customer, orderStockItemList,
 					grandTotal, new java.util.Date());
-			orderDB.getCustomerOrderList().add(order);
-			customer.getOrders().add(order);
+			orderDB.getSupplyOrderList().add(order);
+			showOrders();
+			// customer.getOrders().add(order);
 			this.customer = customer;
-			/*
-			 * for(StockItem stockItem : orderStockItemList){
-			 * System.out.println("Q="+stockItem.getQuantity
-			 * ()+" P="+stockItem.getProduct().getProductName());
-			 * 
-			 * }
-			 */
+			for (StockItem stockItem : orderStockItemList) {
+				System.out.println("Q=" + stockItem.getQuantity() + " P="
+						+ stockItem.getProduct().getProductName());
+
+			}
+
 			// reduce the products' quantity in stockDBControl
 			int quantity;
 			for (int index = 0; index < currentOrderList.size(); index++) {
@@ -546,32 +543,23 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 						.setQuantity(quantity);
 			}
 
-			gui.getCustomerTab().addItemsToOrderCombobox(true);
-			gui.getCustomerOrderHistorytab().setOrderList();
+			// gui.getSupplierTab().addItemsToOrderCombobox(true);
+			gui.getSupplyOrderHistorytab().setOrderList();
 			showOrderDetails(order);
-
-			/*
-			 * JOptionPane.showMessageDialog(null,"Order created by " +
-			 * currentlyLoggedInStaff.getName() + "\n  for " + customer.getName() +
-			 * "\n Grand Total price: " + grandTotal);
-			 */
 
 			// clear the tab and refresh
 			listModel.clear();
 			currentOrderList.clear();
 			currentOrderListQuantity.clear();
 			grandTotal = 0;
+			supplierComboBox.setEnabled(true);
 			removeButton.setEnabled(false);
 			cancelButton.setEnabled(false);
 			processButton.setEnabled(false);
-			fillUpCustomerComboBox();
+			fillUpSupplierComboBox();
 			fillUpProductComboBox();
 			refreshTab(0);
 			stockControlTab.refreshStockControlTab();
-
-			// TESTING - reading back from the orderDB
-			// System.out.println(orderDB.getCustomerOrderList().get(0).getOrderEntryList().get(0).getProduct().getProductName());
-			// System.out.println(orderDB.getCustomerOrderList().get(0).getOrderEntryList().size());
 		}
 		// CANCEL BUTTON
 		if (e.getSource() == cancelButton) {
@@ -596,6 +584,7 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 				listModel.remove(index);
 
 				if (listModel.isEmpty()) {
+					supplierComboBox.setEnabled(true);
 					removeButton.setEnabled(false);
 					processButton.setEnabled(false);
 				}
@@ -603,19 +592,37 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 					orderingList.setSelectedIndex(index - 1);
 				else
 					orderingList.setSelectedIndex(0);
-
 				refreshTab(i);
 			}
 			while (listModel.getSize() != 0);
 			cancelButton.setEnabled(false);
-
 		}
+	}
+
+	private void showOrders() {
+		System.out.println("**********************Supplier Orders*************************");
+
+		for (int i = 0; i < orderDB.getSupplyOrderList().size(); i++) {
+			Order order = (orderDB.getSupplyOrderList().get(i));
+			System.out.println("Order " + order.getId() + " was created at " + order.getDate()
+					+ " by " + order.getCurrentlyLoggedInStaff().getName());
+			System.out.println("Supplier : " + ((Supplier) order.getPerson()).getName());
+			System.out.println("Items in this order :");
+			for (int j = 0; j < order.getOrderEntryList().size(); j++) {
+				StockItem stockItem = order.getOrderEntryList().get(j);
+				System.out.println("  " + stockItem.getQuantity() + "  "
+						+ stockItem.getProduct().getProductName() + "  "
+						+ (stockItem.getProduct().getRetailPrice() * stockItem.getQuantity()));
+			}
+			System.out.println("The total order value is " + order.getGrandTotalOfOrder() + "\n");
+		}
+
 	}
 
 	private void showOrderDetails(Order order) {
 		String orderDetailsMessage = "New order was created at " + order.getDate();
 		orderDetailsMessage += "\nStaff ID : " + order.getCurrentlyLoggedInStaff().getId();
-		orderDetailsMessage += "\nCustomer ID : " + order.getPerson().getId() + " Customer name : "
+		orderDetailsMessage += "\nSupplier ID : " + order.getPerson().getId() + " Supplier name : "
 				+ order.getPerson().getName();
 		orderDetailsMessage += "\nItems in this order : ";
 		for (StockItem stockItem : order.getOrderEntryList()) {
@@ -656,94 +663,10 @@ public class CustomerOrderTab extends JPanel implements ActionListener, ItemList
 		}
 	}
 
-	private ArrayList<StockItem> getRandomOrderItemList(boolean customerOrderMode) {
-		boolean selected[] = new boolean[stockDBControl.getStockList().size()];
-		for (int i = 0; i < selected.length; i++)
-			selected[i] = false;
-
-		orderStockItemList = new ArrayList<StockItem>();
-		grandTotal = 0;
-
-		for (int i = 0; i < random.nextInt((10 - 1) + 1) + 3; i++) {
-			Product randomProduct = stockDBControl.getRandomProduct();
-			int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
-			if (!selected[randomProduct.getProductID() - 1]) {
-				selected[randomProduct.getProductID() - 1] = true;
-				orderStockItemList.add(new StockItem(randomProduct, randomQuantity));
-				if (customerOrderMode) {
-					grandTotal += (randomQuantity * randomProduct.getRetailPrice());
-				}
-				else
-					grandTotal += (randomQuantity * (randomProduct.getSupplierPrice()));
-			}
-		}
-		return orderStockItemList;
-	}
-
-	private void createSupplyProductList() {
-		productList = new ArrayList<ArrayList<Product>>();
-		ArrayList<Product> list;
-		for (Person supplier : personDB.getSupplierList()) {
-			list = new ArrayList<Product>();
-			System.out.println("" + supplier.getName());
-			for (StockItem stockItem : stockDBControl.getStockList()) {
-				Product product = stockItem.getProduct();
-				if (product.getSupplier().equals(supplier)) {
-					list.add(product);
-					System.out.println(product.getProductName());
-				}
-			}
-			productList.add(list);
-		}
-	}
-
-	private void automaticallyCreateOrders() {
-
-		for (int i = 0; i < random.nextInt((10 - 5) + 1) + 5; i++) {
-			orderDB.getCustomerOrderList().add(
-					new Order(personDB.getRandomStaff(), (Customer) personDB.getRandomCustomer(),
-							getRandomOrderItemList(true), grandTotal));
-		}
-
-		createSupplyProductList();
-		orderStockItemList = new ArrayList<StockItem>();
-
-		for (ArrayList<Product> list : productList) {
-			orderStockItemList = new ArrayList<StockItem>();
-			for (Product product : list) {
-				int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
-				orderStockItemList.add(new StockItem(product, randomQuantity));
-			}
-			if (orderStockItemList.size() > 0)
-				orderDB.getSupplyOrderList().add(
-						new Order(personDB.getRandomStaff(), orderStockItemList.get(
-								orderStockItemList.size() - 1).getProduct().getSupplier(),
-								orderStockItemList, grandTotal));
-			else
-				System.out.println("Empty List!!");
-		}
-		grandTotal = 0;
-
-	}
-
-	private void showOrders() {
-		System.out.println("**********************Supplier Orders*************************");
-
-		for (int i = 0; i < orderDB.getSupplyOrderList().size(); i++) {
-			Order order = (orderDB.getSupplyOrderList().get(i));
-			System.out.println("Order " + order.getId() + " was created at " + order.getDate()
-					+ " by " + order.getCurrentlyLoggedInStaff().getName());
-			System.out.println("Supplier : " + ((Supplier) order.getPerson()).getName());
-			System.out.println("Items in this order :");
-			for (int j = 0; j < order.getOrderEntryList().size(); j++) {
-				StockItem stockItem = order.getOrderEntryList().get(j);
-				System.out.println("  " + stockItem.getQuantity() + "  "
-						+ stockItem.getProduct().getProductName() + "  "
-						+ (stockItem.getProduct().getRetailPrice() * stockItem.getQuantity()));
-			}
-			System.out.println("The total order value is " + order.getGrandTotalOfOrder() + "\n");
-		}
-
+	private String textAlignment(String text1, String text2, String text3, String text4) {
+		String s = text1;
+		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
+		return s;
 	}
 
 	@Override

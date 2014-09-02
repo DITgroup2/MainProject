@@ -16,8 +16,7 @@ public class Account {
 	/**
 	 * Accounting constructor
 	 */
-	public Account(ArrayList<Order> purchaseOrderList,
-			ArrayList<Order> supplyOrderList) {
+	public Account(ArrayList<Order> purchaseOrderList, ArrayList<Order> supplyOrderList) {
 		this.totalPurchases = 0;
 		this.totalSales = 0;
 		this.purchaseOrderList = purchaseOrderList;
@@ -27,18 +26,16 @@ public class Account {
 	/**
 	 * @param e
 	 */
-	//public void add(SupplyOrder e) {
-	//	supplyOrderList.add(e);
-	//}
-	
+	// public void add(SupplyOrder e) {
+	// supplyOrderList.add(e);
+	// }
 
-	
 	/**
 	 * @param e
 	 */
-	//public void add(PurchaseOrder e) {
-	//	purchaseOrderList.add(e);
-	//}
+	// public void add(PurchaseOrder e) {
+	// purchaseOrderList.add(e);
+	// }
 
 	/**
 	 * @return the totalSales
@@ -51,8 +48,8 @@ public class Account {
 	 * Calculate the amount of the total sales
 	 */
 	public void setTotalSales() {
-		for (Order order : supplyOrderList) {			
-			totalSales += order.getGrandTotalOfOrder();					
+		for (Order order : supplyOrderList) {
+			totalSales += order.getGrandTotalOfOrder();
 		}
 	}
 

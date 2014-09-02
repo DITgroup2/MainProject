@@ -1,186 +1,158 @@
 package guiTabs;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.Vector;
 
-import javax.swing.JButton;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import order.StockDBControl;
 import order.StockItem;
-import person.Person;
 import retailSystem.Product;
 
-public class StockControlTab extends JPanel implements ActionListener, ItemListener {
+public class StockControlTab extends JPanel implements ListSelectionListener, ComponentListener {
 
-	protected boolean emptiedList;
 	private StockDBControl stockDBControl;
-	private ArrayList<Object> products;
-	protected Vector<String> comboboxItems;
-	protected Product product;
-	protected String name;
-	protected JTextArea productField;
-	protected JTextArea quantityField;
-	protected JTextArea idField;
-	protected JTextArea descriptionField;
-	protected JLabel productLabel;
 	protected JLabel productIdLabel;
+	protected JLabel productNameLabel;
+	protected JLabel productCategoryLabel;
 	protected JLabel quantityLabel;
-	protected JButton restockButton;
+
+	protected DefaultListModel<String> listModel = new DefaultListModel<String>();
+	protected JList<String> stockList = new JList<String>(listModel);
+	protected JScrollPane stockListSroll = new JScrollPane(stockList);
+
+	private TabListCellRenderer renderer = new TabListCellRenderer(true);
+	// source for this class:
+	// http://www.grandt.com/sbe/files/uts2/Chapter10html/Chapter10.htm
+
+	private JPanel mainPanel, outerPanel;
+	private int xSize;
+	private int ySize;
+	private int xPosition;
+	private int yPosition;
+
+	private String textAlignment(String text1, String text2, String text3, String text4) {
+		String s = text1;
+		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
+		return s;
+	}
 
 	public StockControlTab(StockDBControl stockDBControl) {
+		this.stockDBControl = stockDBControl;
 
-		// Initialisation
-		this.setStockDBControl(stockDBControl);
-		productLabel = new JLabel("Product Name");
+		xSize = 530;
+		ySize = 350;
+		mainPanel = new JPanel();
+		mainPanel.setLayout(null);
+		outerPanel = new JPanel();
+		outerPanel.setLayout(null);
+		outerPanel.add(mainPanel);
+		outerPanel.setBorder(BorderFactory.createLineBorder(new Color(176, 168, 168), 8, true));
+		this.setBorder(BorderFactory.createLineBorder(new Color(176, 168, 168), 4));
+		add(outerPanel, new GridBagConstraints());
+		addComponentListener(this);
+
+		productIdLabel = new JLabel("ID");
+		productNameLabel = new JLabel("Product Name");
+		productCategoryLabel = new JLabel("Category");
 		quantityLabel = new JLabel("Quantity");
-		productIdLabel = new JLabel("Product ID");
-		idField = new JTextArea();
-		productField = new JTextArea();
-		productField.setEditable(false);
-		quantityField = new JTextArea();
-		quantityField.setEditable(false);
-		idField.setEditable(false);
-		restockButton = new JButton("Restock");
 
-		// Set dimensions of buttons
-		restockButton.addActionListener(this);
-		restockButton.setBounds(209, 320, 100, 23);
-		productIdLabel.setBounds(9, 10, 93, 14);
-		idField.setBounds(9, 50, 93, 300);
-		productLabel.setBounds(100, 10, 93, 14);
-		productField.setBounds(100, 50, 200, 300);
-		quantityLabel.setBounds(309, 10, 93, 14);
-		quantityField.setBounds(309, 50, 100, 300);
+		productIdLabel.setBounds(18, 7, 40, 23);
+		productNameLabel.setBounds(77, 7, 340, 23);
+		quantityLabel.setBounds(280, 7, 100, 23);
+		productCategoryLabel.setBounds(390, 7, 150, 23);
 
-		// Finish setup and start the GUI
-		addAllElements();
+		productIdLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		productNameLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		quantityLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		productCategoryLabel.setFont(new Font("Arial", Font.BOLD, 20));
+
+		stockList.addListSelectionListener(this);
+		stockListSroll.setBounds(10, 30, 510, 310);
+		mainPanel.add(productIdLabel);
+		mainPanel.add(stockListSroll);
+		mainPanel.add(productNameLabel);
+		mainPanel.add(productCategoryLabel);
+		mainPanel.add(quantityLabel);
+
+		renderer.setTabs(new int[] { 70, 300, 400 });
+		stockList.setCellRenderer(renderer);
 		setLayout(null);
 		setVisible(true);
-		setProductTextField(0, stockDBControl.getStockList());
-		setQuantityTextField(0, stockDBControl.getStockList());
+		refreshStockControlTab();
 	}
 
-	/**
-	 * Add every element to the pans
-	 */
-	public void addAllElements() {
-		add(idField);
-		add(productIdLabel);
-		add(productLabel);
-		add(productField);
-		add(quantityLabel);
-		add(quantityField);
-		// add(restockButton);
-	}
-
-	/**
-	 * Set the text to appear in the product field
-	 * 
-	 * @param index
-	 *            The selected index
-	 * @param list
-	 *            The list of items and the quantity in stock
-	 */
-	public void setProductTextField(int index, ArrayList<StockItem> list) {
-
+	public void setStockList(ArrayList<StockItem> list) {
+		int index = 0;
+		listModel.clear();
 		for (StockItem stockItem : list) {
-			Product p = stockItem.getProduct();
-			String prod = p.getProductName();
-			idField.append("\n" + p.getProductID());
-			productField.append("\n " + prod);
-		}
-		// Unless there are no items in the list, set the status of the lsit to non empty
-		if (list.size() > 0) {
-			emptiedList = false;
+			Product product = stockItem.getProduct();
+			listModel.addElement(textAlignment("   " + product.getProductID(), product
+					.getProductName(), "" + stockItem.getQuantity(), product.getProductCategory()));
+			// stockList.setSelectedIndex(orderListIndex);
+			index++;
 		}
 	}
 
-	/**
-	 * Set the text to appear in the quantity field
-	 * 
-	 * @param index
-	 *            The selected index
-	 * @param list
-	 *            The list of items and the quantity in stock
-	 */
-	public void setQuantityTextField(int index, ArrayList<StockItem> list) {
-
-		for (StockItem stockItem : list) {
-			int quantity = stockItem.getQuantity();
-			quantityField.append("\n" + quantity);
-		}
-
-		if (list.size() > 0) {
-			emptiedList = false;
-		}
+	public void refreshStockControlTab() {
+		setStockList(stockDBControl.getStockList());
 	}
 
-	/**
-	 * Restock items
-	 * 
-	 * @param person
-	 * @param list
-	 *            The list of items
-	 */
-	public void Restock(Person person, ArrayList<Person> list) {
-		boolean valid = false;
-		String value = JOptionPane.showInputDialog(null, "Enter how many :", 0);
-		do {
-			try {
-				int quantity = Integer.parseInt(value);
-				valid = true;
-			}
-			catch (NumberFormatException error) {
-				value = JOptionPane.showInputDialog(null, "Wrong input!!Enter how many :", 0);
-				error.printStackTrace();
-			}
-		}
-		while (!valid);
-		System.out.println(value);
-	}
-
-	/**
-	 * Action listeners
-	 */
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == restockButton) {
-			Restock(null, null);
-		}
-	}
-
-	/**
-	 * @return Stock database controls
-	 */
-	public StockDBControl getstockDBControl() {
-		return stockDBControl;
-	}
-
-	/**
-	 * Sets the stock database controls
-	 * 
-	 * @param stockDBControl
-	 */
 	public void setStockDBControl(StockDBControl stockDBControl) {
 		this.stockDBControl = stockDBControl;
 	}
 
-	/**
-	 * Event listener for the combo box
-	 */
+	// list selection event
 	@Override
-	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
+	public void valueChanged(ListSelectionEvent e) {
+		if (e.getSource() == stockList) {
+			// check if order list is empty
+			if (stockList.getSelectedIndex() > -1) {
+				// separate the text in the selected list item
+				String[] values = stockList.getSelectedValue().split("\\t");
+				// JOptionPane.showMessageDialog(null, values[1]);
+			}
+		}
 	}
 
-	public void refreshStockControlTab() {
+	@Override
+	public void componentResized(ComponentEvent e) {
+
+		xPosition = ((((int) mainPanel.getParent().getSize().getWidth()) - xSize) / 2);
+		yPosition = ((((int) mainPanel.getParent().getSize().getHeight()) - ySize) / 2);
+		mainPanel.setBounds(xPosition, yPosition, xSize, ySize);
+
+		xPosition = ((((int) outerPanel.getParent().getSize().getWidth()) - xSize) / 2);
+		yPosition = ((((int) outerPanel.getParent().getSize().getHeight()) - ySize) / 2);
+		outerPanel.setBounds(xPosition - 50, yPosition - 40, xSize + 100, ySize + 80);
+
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {
 		// TODO Auto-generated method stub
 
 	}

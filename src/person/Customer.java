@@ -1,5 +1,9 @@
 package person;
 
+import java.util.ArrayList;
+
+import order.Order;
+
 
 /**
  * @author Roland Katona
@@ -7,11 +11,14 @@ package person;
  */
 public class Customer extends Person {
 
+	private ArrayList<Order> orders;
+	
 	/**
 	 * Default constructor
 	 */
 	public Customer() {
 		super();
+		orders = new ArrayList<Order>();
 	}
 
 	/**
@@ -22,5 +29,16 @@ public class Customer extends Person {
 	 */
 	public Customer(String name, String email, String contactNumber, String address) {
 		super(name, email, contactNumber, address);
+		orders = new ArrayList<Order>();
 	}
+
+	public ArrayList<Order> getOrders() {
+		return orders;
+	}
+
+	public void setOrders(ArrayList<Order> orders) {
+		this.orders = orders;
+	}
+	
+	
 }

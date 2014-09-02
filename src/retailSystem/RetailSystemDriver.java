@@ -3,6 +3,9 @@ package retailSystem;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import order.OrderDB;
 import order.StockDBControl;
 
@@ -10,10 +13,10 @@ public class RetailSystemDriver {
 
 	private PersonDB personDB;
 	private StockDBControl stockDBControl;
+	private OrderDB orderDB;
 	private static boolean hasAccessLevelSet;
 	private static boolean priviledged;
 	private Product product;
-	private OrderDB orderDB;
 	private static String contactNumPattern = "^[0].[0-9]{8,10}$";
 	private static String accessLevelPattern = "^[1-2]$";
 	private static String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
@@ -50,19 +53,40 @@ public class RetailSystemDriver {
 
 	public RetailSystemDriver() {
 		personDB = new PersonDB();
-		orderDB = new OrderDB();
 
 		personDB.automaticallyCreateStaff();
 		personDB.automaticallyCreateSupplier();
 		personDB.automaticallyCreateCustomer();
-
+		orderDB = new OrderDB();
 		stockDBControl = new StockDBControl();
 		automaticallyCreateProducts();
 
+		try {
+			com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme("Large-Font",
+					"INSERT YOUR LICENSE KEY HERE", "DIT");
+			UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
+		}
+		catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		new Login(personDB, stockDBControl, orderDB);
 	}
 
 	private void automaticallyCreateProducts() {
+		// for(int i=0;i<4;i++){
 		product = new Product(
 				"Asus EeeePC 1015px",
 				"Atom N570 / 1.66 GHz - Windows 7 Starter - 1 GB RAM - 250 GB HDD - 10.1 inches wide 1024 x 600 - Intel GMA 3150 - black Series",
@@ -126,6 +150,7 @@ public class RetailSystemDriver {
 				"802.11x/Band(s):4.0 Bands:1700 1900 2100 850 900 UMTS Battery Life (As Tested):9 hours Bluetooth Version:Yes Camera Resolution:8 MP Rear; 1.2 MP Front Capacities Available:32GB 64GB Space Gray Colors Available:Gold Silver CPU:Apple A7 Dimensions:4.87 x 2.31 x 0.3 inches Form Factor:Candy bar GPS:No High-Speed Data:16GB EVDO Rev A HSPA+ 42 LTE microSD Slot :GSM NFC:16 GB Operating System as Tested:iOS Phone Capability / Network:800 CDMA LTE UMTS Processor Speed:1.3GHz Screen Pixels Per Inch:326 Screen Resolution:1136 x 640 pixels Screen Size:4 inches Screen Type:LCD Service Provider:Verizon Wireless Total Integrated Storage:No Video Camera Resolution:802.11 a/b/g/n",
 				"Smartphone", 220, .2, personDB.getRandomSupplier());
 		stockDBControl.addNewProductToStockList(product, 6);
+		// }
 	}
 
 	public static void main(String args[]) {

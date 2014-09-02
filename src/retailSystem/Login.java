@@ -47,6 +47,7 @@ public class Login extends JFrame implements ActionListener {
 		this.staffList = personDB.getStaffList();
 		this.personDB = personDB;
 		this.orderDB = orderDB;
+
 		runLogin();
 		login = false;
 	}
@@ -107,6 +108,7 @@ public class Login extends JFrame implements ActionListener {
 			for (Person person : staffList) {
 				if (person.getName().equals(usernameText)) {
 					user = (Staff) person;
+
 					break;
 				}
 			}
@@ -114,32 +116,29 @@ public class Login extends JFrame implements ActionListener {
 				char[] validate = passwordField.getPassword();
 				login = ((Staff) user).passwordValidation(validate);
 				if (login) {
+					gui = new MainGUI((Staff) user, personDB, stockDBControl, this, orderDB);
 					if (((Staff) user).getAccessLevel() == 2) {
-						this.dispose();
-						JOptionPane.showMessageDialog(null, "Login successful!");
-						gui = new MainGUI((Staff) user, personDB, stockDBControl, this, orderDB);
 						gui.getSupplierTab().enableButtons(true);
 						gui.getCustomerTab().enableButtons(true);
 						gui.getStaffTab().enableButtons(true);
 						gui.getProductTab().enableButtons(true);
 						RetailSystemDriver.setPriviledged(true);
 						gui.setVisible(true);
-						this.setVisible(false);
+						setVisible(false);
 					}
 					else {
-						this.dispose();
-						JOptionPane.showMessageDialog(null, "Login successful!");
-						gui = new MainGUI(personDB, stockDBControl, this);
+
 						gui.getSupplierTab().enableButtons(false);
 						gui.getCustomerTab().enableButtons(false);
 						gui.getStaffTab().enableButtons(false);
 						gui.getProductTab().enableButtons(false);
 						RetailSystemDriver.setPriviledged(false);
-						this.setVisible(false);
+						gui.setVisible(true);
+						setVisible(false);
 					}
 
 					setVisible(false);
-					gui.setVisible(true);
+					// JOptionPane.showMessageDialog(null, "Login successful!");
 				}
 				else
 					JOptionPane.showMessageDialog(null, "Wrong Password!");
@@ -147,9 +146,5 @@ public class Login extends JFrame implements ActionListener {
 			else
 				JOptionPane.showMessageDialog(null, "Invalid username!");
 		}
-	}
-
-	public void submit() {
-		btnNewButton.doClick();
 	}
 }

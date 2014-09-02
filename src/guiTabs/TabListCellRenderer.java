@@ -21,8 +21,11 @@ class TabListCellRenderer extends JLabel implements ListCellRenderer {
 	protected int m_defaultTab = 50;
 	protected int[] m_tabs = null;
 
-	public TabListCellRenderer() {
+	protected boolean allLeftAlligned;
+
+	public TabListCellRenderer(boolean allLeftAlligned) {
 		super();
+		this.allLeftAlligned = allLeftAlligned;
 		m_noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 		setOpaque(true);
 		setBorder(m_noFocusBorder);
@@ -90,9 +93,9 @@ class TabListCellRenderer extends JLabel implements ListCellRenderer {
 			// this will align right from the second token
 			// if you take this section out every token will be aligned to left
 			// according to the tab settings
-
-			if (x - m_fm.stringWidth(sNext) > 0)
-				x -= m_fm.stringWidth(sNext);
+			if (!allLeftAlligned)
+				if (x - m_fm.stringWidth(sNext) > 0)
+					x -= m_fm.stringWidth(sNext);
 			// by Sabee ends...
 
 			g.drawString(sNext, x, y);
@@ -108,4 +111,5 @@ class TabListCellRenderer extends JLabel implements ListCellRenderer {
 			x = getTab(index);
 		}
 	}
+
 }

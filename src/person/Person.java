@@ -5,25 +5,28 @@ package person;
  *
  */
 public class Person {
-
+	
 	private static int uniqueId = 1;
-
+	
 	private int id;
 	private String name;
 	private String email;
 	private String contactNumber;
-	private String address, imageString;
+	private String address;
+	private String imageString;
+	
 
 	/**
 	 * Default constructor
 	 */
-	public Person() {
+	public Person(){
 		name = "";
 		email = "";
 		address = "";
 		contactNumber = "0";
+		imageString = null;
 	}
-
+	
 	/**
 	 * @param name
 	 * @param email
@@ -31,28 +34,28 @@ public class Person {
 	 * @param address
 	 */
 	public Person(String name, String email, String contactNumber, String address) {
-
+		
 		this.name = name;
 		this.email = email;
 		this.contactNumber = contactNumber;
 		this.address = address;
-		this.imageString = null;
 		id = uniqueId++;
+		imageString = null;
 	}
-
-	public static int getUniqueId() {
+	
+	public static int getUniqueId(){
 		return uniqueId;
 	}
-
+	
 	/**
 	 * 
 	 */
-	public void displayDetails() {
-		System.out.println("\nID : " + this.getId());
-		System.out.println("Name : " + name);
-		System.out.println("Email : " + email);
-		System.out.println("Phone : " + contactNumber);
-		System.out.println("Address : " + address);
+	public void displayDetails(){		
+		System.out.println("\nID : "+this.getId());
+		System.out.println("Name : "+name);
+		System.out.println("Email : "+email);
+		System.out.println("Phone : "+contactNumber);
+		System.out.println("Address : "+address);		
 	}
 
 	/**
@@ -107,14 +110,14 @@ public class Person {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	/**
 	 * @return name
 	 */
 	public String getName() {
 		return name;
 	}
-
+	
 	public String getImageString() {
 		return imageString;
 	}

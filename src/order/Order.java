@@ -1,6 +1,8 @@
 package order;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
 import person.Person;
 import person.Staff;
@@ -14,18 +16,45 @@ public class Order {
 	private int id;
 	private Person person;
 	private Staff currentlyLoggedInStaff; // identify which staff was logged in and made the order
-	private ArrayList<StockItem> orderEntryList;
+	private ArrayList<StockItem> orderItemsList;
 	private double grandTotal;
+	private Date date;
 	private boolean status;
+	long rangebegin = Timestamp.valueOf("2013-02-08 00:00:00").getTime();
+	long rangeend = Timestamp.valueOf("2014-08-08 00:58:00").getTime();
+	long diff = rangeend - rangebegin + 1;
+	Timestamp rand;
 
-	public Order(Staff currentlyLoggedInStaff, Person person, ArrayList<StockItem> orderEntryList,
+	public static int getUniqueId() {
+		return uniqueId;
+	}
+
+	public Order(Staff currentlyLoggedInStaff, Person person, ArrayList<StockItem> orderItemsList,
 			double grandTotal) {
 		this.grandTotal = grandTotal;
 		this.id = uniqueId++;
 		this.person = person;
 		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
-		this.orderEntryList = orderEntryList;
+		this.orderItemsList = orderItemsList;
 		this.status = false;
+		rand = new Timestamp(rangebegin + (long) (Math.random() * diff));
+		date = rand;
+	}
+
+	public Order(Staff currentlyLoggedInStaff, Person person, ArrayList<StockItem> orderItemsList,
+			double grandTotal, Date date) {
+		this.grandTotal = grandTotal;
+		this.id = uniqueId++;
+		this.person = person;
+		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
+		this.orderItemsList = orderItemsList;
+		this.status = false;
+		rand = new Timestamp(date.getTime());
+		this.date = rand;
+	}
+
+	public Date getDate() {
+		return date;
 	}
 
 	public Staff getCurrentlyLoggedInStaff() {
@@ -49,11 +78,11 @@ public class Order {
 	}
 
 	public ArrayList<StockItem> getOrderEntryList() {
-		return orderEntryList;
+		return orderItemsList;
 	}
 
 	public void setOrderEntryList(ArrayList<StockItem> orderEntryList) {
-		this.orderEntryList = orderEntryList;
+		this.orderItemsList = orderEntryList;
 	}
 
 	public boolean isStatus() {

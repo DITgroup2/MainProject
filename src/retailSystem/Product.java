@@ -22,6 +22,10 @@ public class Product {
 	public static int getUniqueId() {
 		return uniqueId;
 	}
+	
+	public Product(){
+		
+	}
 
 	/**
 	 * @param productName
