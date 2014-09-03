@@ -42,6 +42,15 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 	private int xPosition;
 	private int yPosition;
 
+	/**
+	 * Aligns text in the text pane
+	 * 
+	 * @param text1
+	 * @param text2
+	 * @param text3
+	 * @param text4
+	 * @return
+	 */
 	private String textAlignment(String text1, String text2, String text3, String text4) {
 		String s = text1;
 		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
@@ -49,6 +58,8 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 	}
 
 	public StockControlTab(StockDBControl stockDBControl) {
+
+		// Initialisation
 		this.stockDBControl = stockDBControl;
 
 		xSize = 530;
@@ -68,11 +79,13 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 		productCategoryLabel = new JLabel("Category");
 		quantityLabel = new JLabel("Quantity");
 
+		// Set dimensions of buttons
 		productIdLabel.setBounds(18, 7, 40, 23);
 		productNameLabel.setBounds(77, 7, 340, 23);
 		quantityLabel.setBounds(280, 7, 100, 23);
 		productCategoryLabel.setBounds(390, 7, 150, 23);
 
+		// Change the font
 		productIdLabel.setFont(new Font("Arial", Font.BOLD, 20));
 		productNameLabel.setFont(new Font("Arial", Font.BOLD, 20));
 		quantityLabel.setFont(new Font("Arial", Font.BOLD, 20));
@@ -86,6 +99,7 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 		mainPanel.add(productCategoryLabel);
 		mainPanel.add(quantityLabel);
 
+		// Finish setup and start the GUI
 		renderer.setTabs(new int[] { 70, 300, 400 });
 		stockList.setCellRenderer(renderer);
 		setLayout(null);
@@ -113,7 +127,9 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 		this.stockDBControl = stockDBControl;
 	}
 
-	// list selection event
+	/**
+	 * List selection event
+	 */
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getSource() == stockList) {
@@ -126,6 +142,9 @@ public class StockControlTab extends JPanel implements ListSelectionListener, Co
 		}
 	}
 
+	/**
+	 * When the window gets resized
+	 */
 	@Override
 	public void componentResized(ComponentEvent e) {
 

@@ -36,6 +36,14 @@ public class SupplierTab extends PersonTab implements MouseListener {
 	private Vector<String> productsComboboxItems;
 	private boolean automaticItemSelection;
 
+	/**
+	 * Set the imformation to appear in the text fields
+	 * 
+	 * @param index
+	 *            The selected index
+	 * @param list
+	 *            The list of suppliers
+	 */
 	public void setTextField(int index, ArrayList<Person> list) {
 
 		super.setTextField(index, list);
@@ -46,10 +54,18 @@ public class SupplierTab extends PersonTab implements MouseListener {
 		automaticItemSelection = true;
 		comboBox.setSelectedIndex(index);
 		addItemsToProductCombobox();
+
+		// Reset the view
 		revalidate();
 		repaint();
 	}
 
+	/**
+	 * Clear all data in the text fields
+	 * 
+	 * @param list
+	 *            The list of suppliers
+	 */
 	public void clearTextFields(ArrayList<Person> list) {
 
 		super.clearTextFields(list);
@@ -65,8 +81,8 @@ public class SupplierTab extends PersonTab implements MouseListener {
 	 */
 	public SupplierTab(PersonDB personDB, JTabbedPane tabbedPane, MainGUI gui) {
 
+		// Initialise elements
 		super(personDB);
-
 		this.tabbedPane = tabbedPane;
 		this.gui = gui;
 		automaticItemSelection = true;
@@ -102,19 +118,24 @@ public class SupplierTab extends PersonTab implements MouseListener {
 		contactNameLabel.setBounds(59, 160, 93, 14);
 		vatNumberLabel.setBounds(59, 185, 94, 14);
 
+		// Finish setting up the tab
 		setTextField(0, personDB.getSupplierList());
 		setFieldEditable(false);
 		addAllElements();
 	}
 
+	/**
+	 * @return A new supplier button
+	 */
 	public JButton getNewSupplierButton() {
 		return newSupplierButton;
 	}
 
+	/**
+	 * Add every element to the panel
+	 */
 	public void addAllElements() {
-
 		super.addAllElements();
-
 		mainPanel.add(vatNumberField);
 		mainPanel.add(contactNameField);
 		mainPanel.add(vatNumberLabel);
@@ -124,6 +145,9 @@ public class SupplierTab extends PersonTab implements MouseListener {
 		 */
 	}
 
+	/**
+	 * Open fields to enter person details
+	 */
 	public void addItemsToProductCombobox() {
 		productsComboboxItems.clear();
 		String item = "<html><font color='red'>Add New Product</font></html>";
@@ -149,26 +173,33 @@ public class SupplierTab extends PersonTab implements MouseListener {
 		vatNumber = null;
 		contactName = null;
 
+		// Contact name
 		if (!contactNameField.getText().equals(""))
 			contactName = contactNameField.getText();
 		else {
 			errorMessage = errorMessage + "Contact name field cannot be empty!\n";
 		}
+
+		// Vat number
 		if (!vatNumberField.getText().equals(""))
 			vatNumber = vatNumberField.getText();
 		else {
 			errorMessage = errorMessage + "VAT number field cannot be empty!\n";
 		}
 
+		// Execute if anything has been entered into any field
 		if (name != null && address != null && email != null && contactNumber != null
 				&& vatNumber != null && contactName != null) {
 
+			// Specific handler for edit mode
 			if (editMode) {
 				personDB.changePersonDetails(person, name, email, contactNumber, address, 0, null,
 						vatNumber, contactName);
 				setTextField(comboBox.getSelectedIndex(), personDB.getSupplierList());
 				valid = true;
 			}
+
+			// Handler for new supplier mode
 			else {
 
 				valid = true;
@@ -176,33 +207,39 @@ public class SupplierTab extends PersonTab implements MouseListener {
 						contactName, vatNumber);
 				setTextField(personDB.getSupplierList().size() - 1, personDB.getSupplierList());
 			}
-
+			// Enable buttons
 			deletePersonButton.setEnabled(true);
-
 			newPersonButton.setEnabled(true);
-			newPersonButton.setVisible(true);
-
 			editPersonButton.setEnabled(true);
+
+			// Set the visibility of buttons
 			editPersonButton.setVisible(true);
-
 			submitButton.setVisible(false);
-
+			newPersonButton.setVisible(true);
 			cancelButton.setVisible(false);
 			cancelEditButton.setVisible(false);
 		}
 
+		// Print an error message if errors exist
 		else {
 			JOptionPane.showMessageDialog(null, "" + errorMessage);
 		}
+
+		// Print an error message if errors exist
 		revalidate();
 		repaint();
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
+		// Get action listeners for the super class
 		super.actionPerformed(e);
 
+		// Submit clicked
 		if (e.getSource() == submitButton) {
 			if (submitButtonMode == 3) {
 				editMode = false;
@@ -212,10 +249,12 @@ public class SupplierTab extends PersonTab implements MouseListener {
 					gui.getProductTab().addItemsToSupplierCombobox(personDB.getSupplierList());
 				}
 			}
+			// Creating a new supplier
 			else if (submitButtonMode == 2) {
 				editMode = true;
 				personDetailsForm();
 			}
+			// Using an existing supplier
 			else if (submitButtonMode == 1) {
 				editMode = false;
 				personDetailsForm();
@@ -227,20 +266,24 @@ public class SupplierTab extends PersonTab implements MouseListener {
 			setFieldEditable(false);
 			valid = false;
 		}
+		// New supplier clicked
 		if (e.getSource() == newPersonButton) {
 			clearTextFields(personDB.getSupplierList());
 			super.actionPerformed(e);
 			setFieldEditable(true);
 		}
+		// Edit clicked
 		if (e.getSource() == editPersonButton) {
 			setFieldEditable(true);
 		}
+		// Cancel Clicked
 		if (e.getSource() == cancelButton) {
 			setFieldEditable(false);
 			setTextField(personDB.getSupplierList().size() - 1, personDB.getSupplierList());
 			if (!(personDB.getSupplierList().size() > 0))
 				clearTextFields(personDB.getSupplierList());
 		}
+		// Cancel clicked within edit mode
 		if (e.getSource() == cancelEditButton) {
 			setTextField(comboBox.getSelectedIndex(), personDB.getSupplierList());
 			setFieldEditable(false);
@@ -248,10 +291,12 @@ public class SupplierTab extends PersonTab implements MouseListener {
 				clearTextFields(personDB.getSupplierList());
 		}
 
+		// Delete supplier clicked
 		if (e.getSource() == deletePersonButton) {
 			deletePerson(person, personDB.getSupplierList());
 		}
 
+		// New supplier selected
 		if (e.getSource() == newSupplierButton) {
 			newPersonButton.doClick();
 			submitButtonMode = 3;
@@ -261,12 +306,21 @@ public class SupplierTab extends PersonTab implements MouseListener {
 		repaint();
 	}
 
+	/**
+	 * Toggle editing of fields
+	 * 
+	 * @param editable
+	 *            Editable status of the fields
+	 */
 	public void setFieldEditable(boolean editable) {
 		super.setFieldEditable(editable);
 		vatNumberField.setEditable(editable);
 		contactNameField.setEditable(editable);
 	}
 
+	/**
+	 * Event listener for the combo box
+	 */
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {

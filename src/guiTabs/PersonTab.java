@@ -54,6 +54,12 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 
 	// private final boolean PRIVILEDGED_ACCESS = RetailSystemDriver.isPriviledged();
 
+	/**
+	 * Person tab comment
+	 * 
+	 * @param personDB
+	 *            Database for people
+	 */
 	public PersonTab(PersonDB personDB) {
 
 		this.personDB = personDB;
@@ -104,6 +110,7 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 
 		addComponentListener(this);
 
+		// Add listeners to elements
 		newPersonButton.addActionListener(this);
 		editPersonButton.addActionListener(this);
 		deletePersonButton.addActionListener(this);
@@ -113,7 +120,9 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		cancelButton.setVisible(false);
 		cancelEditButton.addActionListener(this);
 		cancelEditButton.setVisible(false);
+		scrollPane = new JScrollPane(addressField);
 
+		// Set the dimensions for elements
 		idNumberLabel.setBounds(203, 7, 265, 20);
 		nameField.setBounds(200, 30, 265, 23);
 		nameField.setColumns(10);
@@ -128,7 +137,6 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		contactNumberLabel.setBounds(59, 83, 93, 14);
 		addressLabel.setBounds(59, 106, 93, 14);
 
-		scrollPane = new JScrollPane(addressField);
 		scrollPane.setBounds(200, 105, 265, 53);
 
 		submitButton.setBounds(200, 250, 106, 23);
@@ -142,11 +150,17 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		comboBox.setBounds(200, 285, 265, 23);
 		comboBox.addItemListener(this);
 
-		// setLayout(new GridBagLayout());
+		// Set the layout for the tab as a whole
 		setLayout(null);
 		setVisible(true);
 	}
 
+	/**
+	 * Refreshes the elements in the combo box when a person has been added to the list
+	 * 
+	 * @param list
+	 *            The updated list
+	 */
 	public void addItemsToCombobox(ArrayList<Person> list) {
 		comboboxItems.clear();
 		String item = "";
@@ -158,8 +172,16 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		repaint();
 	}
 
+	/**
+	 * Change the text displayed in the text field
+	 * 
+	 * @param index
+	 *            The selected index
+	 * @param list
+	 *            The list on people
+	 */
 	public void setTextField(int index, ArrayList<Person> list) {
-
+		// Display data in the text field if the list isn't empty
 		if (list.size() > 0) {
 			person = list.get(index);
 			idNumberLabel.setText("" + person.getId());
@@ -171,11 +193,20 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		contactNumberField.setText(person.getContactNumber());
 		emailField.setText(person.getEmail());
 
+		// Update the combo box
 		addItemsToCombobox(list);
 		comboBox.setSelectedIndex(index);
 	}
 
+	/**
+	 * Clears all data in all text fields
+	 * 
+	 * @param list
+	 *            The list of people
+	 */
 	public void clearTextFields(ArrayList<Person> list) {
+
+		// Get the ID of the person
 		if (list.size() > 0) {
 			idNumberLabel.setText("" + Person.getUniqueId());
 		}
@@ -189,8 +220,10 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		addressField.setText("");
 	}
 
+	/**
+	 * Adds all elements to the panel
+	 */
 	public void addAllElements() {
-
 		mainPanel.add(newPersonButton);
 		mainPanel.add(deletePersonButton);
 		mainPanel.add(submitButton);
@@ -215,6 +248,12 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		// this.add(mainPanel, BorderLayout.CENTER);
 	}
 
+	/**
+	 * Toggles whether fields can be edited or not
+	 * 
+	 * @param editable
+	 *            Editable status of fields
+	 */
 	public void setFieldEditable(boolean editable) {
 		nameField.setEditable(editable);
 		contactNumberField.setEditable(editable);
@@ -222,22 +261,36 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		addressField.setEditable(editable);
 	}
 
+	/**
+	 * Toggle enabling buttons
+	 * 
+	 * @param enabled
+	 *            Enabled status of buttons
+	 */
 	public void enableButtons(boolean enabled) {
 		newPersonButton.setEnabled(enabled);
 		editPersonButton.setEnabled(enabled);
 		deletePersonButton.setEnabled(enabled);
 	}
 
+	/**
+	 * Removes a person from the database
+	 * 
+	 * @param person
+	 *            The person to remove
+	 * @param list
+	 *            The list of people
+	 */
 	public void deletePerson(Person person, ArrayList<Person> list) {
 
+		// Ask for confirmation and continue if yes is clicked
 		int answer = JOptionPane.showConfirmDialog(null, "Do you really want to delete "
-				+ person.getName() + "?", " CONFIRMATION ", JOptionPane.YES_NO_OPTION);// displaying
-																						// JOptionPane.YES_NO_OPTION
-																						// Confirmdialog
-																						// box
+				+ person.getName() + "?", " CONFIRMATION ", JOptionPane.YES_NO_OPTION);
 		if (answer == JOptionPane.YES_OPTION) {
 			personDB.deletePersonFromList(person);
 		}
+
+		// Reset the data in the list to account for the removed person
 		if (list.size() > 0) {
 			setTextField(0, list);
 		}
@@ -252,7 +305,12 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		repaint();
 	}
 
+	/**
+	 * Sets the fields editable for creating or editing person details
+	 */
 	public void personDetailsForm() {
+
+		// Initially clear the text fields
 		name = null;
 		email = null;
 		contactNumber = null;
@@ -260,12 +318,15 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 
 		errorMessage = "";
 
+		// Name field
 		if (!nameField.getText().equals("")) {
 			name = nameField.getText();
 		}
 		else {
 			errorMessage = errorMessage + "Name field cannot be empty!\n";
 		}
+
+		// Email field
 		if (!emailField.getText().equals("")) {
 			email = (emailField.getText());
 			if (!RetailSystemDriver.validateEmail(email)) {
@@ -277,6 +338,8 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		else {
 			errorMessage = errorMessage + "Email field cannot be empty!\n";
 		}
+
+		// Contact number field
 		if (!contactNumberField.getText().equals("")) {
 			contactNumber = (contactNumberField.getText());
 			/* try { */
@@ -295,6 +358,7 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 			errorMessage = errorMessage + "Contact number field cannot be empty!\n";
 		}
 
+		// Address field
 		if (!addressField.getText().equals(""))
 			address = (addressField.getText());
 		else {
@@ -302,9 +366,13 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 		}
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
+		// New button clicked
 		if (e.getSource() == newPersonButton) {
 			submitButton.setVisible(true);
 			newPersonButton.setVisible(false);
@@ -317,6 +385,8 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 				idNumberLabel.setText("" + Person.getUniqueId());
 			}
 		}
+
+		// Edit button clicked
 		if (e.getSource() == editPersonButton) {
 			submitButtonMode = 2;
 			editPersonButton.setVisible(false);
@@ -326,6 +396,8 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 			deletePersonButton.setEnabled(false);
 			comboBox.setEnabled(false);
 		}
+
+		// Cancel button clicked
 		if (e.getSource() == cancelButton) {
 			submitButton.setVisible(false);
 			newPersonButton.setVisible(true);
@@ -336,6 +408,8 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 				editPersonButton.setEnabled(true);
 			}
 		}
+
+		// Cancel button clicked in edit more
 		if (e.getSource() == cancelEditButton) {
 			submitButton.setVisible(false);
 			cancelEditButton.setVisible(false);
@@ -345,6 +419,8 @@ public class PersonTab extends JPanel implements ActionListener, ItemListener, C
 			editPersonButton.setVisible(true);
 			comboBox.setEnabled(true);
 		}
+
+		// Refresh the view
 		revalidate();
 		repaint();
 	}

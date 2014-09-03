@@ -317,7 +317,6 @@ public class SupplyOrderTab extends JPanel implements ActionListener, ItemListen
 		itemsQuantity.clear();
 		itemsPrice.clear();
 		for (StockItem stockItem : list) {
-			System.out.println(supplierComboBox.getSelectedItem());
 			if (stockItem.getProduct().getSupplier().getName().equals(
 					supplierComboBox.getSelectedItem())) {
 				comboBoxItems.add(stockItem.getProduct().getProductName());
@@ -527,12 +526,12 @@ public class SupplyOrderTab extends JPanel implements ActionListener, ItemListen
 			showOrders();
 			// customer.getOrders().add(order);
 			this.customer = customer;
-			for (StockItem stockItem : orderStockItemList) {
-				System.out.println("Q=" + stockItem.getQuantity() + " P="
-						+ stockItem.getProduct().getProductName());
-
-			}
-
+			/*
+			 * for (StockItem stockItem : orderStockItemList) { System.out.println("Q=" +
+			 * stockItem.getQuantity() + " P=" + stockItem.getProduct().getProductName());
+			 * 
+			 * }
+			 */
 			// reduce the products' quantity in stockDBControl
 			int quantity;
 			for (int index = 0; index < currentOrderList.size(); index++) {

@@ -110,6 +110,9 @@ public class CustomerOrderHistoryTab extends JPanel implements ComponentListener
 
 	}
 
+	/**
+	 * Set the order list
+	 */
 	public void setOrderList() {
 
 		int index = 0;
@@ -124,12 +127,26 @@ public class CustomerOrderHistoryTab extends JPanel implements ComponentListener
 		}
 	}
 
+	/**
+	 * Align text
+	 * 
+	 * @param text1
+	 * @param text2
+	 * @param text3
+	 * @param text4
+	 * @return
+	 */
 	private String textAlignment(String text1, String text2, String text3, String text4) {
 		String s = text1;
 		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
 		return s;
 	}
 
+	/**
+	 * Display the details of the order
+	 * 
+	 * @param order
+	 */
 	private void showOrderDetails(Order order) {
 		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
 
@@ -154,6 +171,9 @@ public class CustomerOrderHistoryTab extends JPanel implements ComponentListener
 				JOptionPane.PLAIN_MESSAGE);
 	}
 
+	/**
+	 * Display the customer orders
+	 */
 	public void showCustomerOrders() {
 		textArea.setText("");
 		for (int i = 0; i < orderDB.getCustomerOrderList().size(); i++) {
@@ -171,6 +191,9 @@ public class CustomerOrderHistoryTab extends JPanel implements ComponentListener
 		}
 	}
 
+	/**
+	 * Display the supplier orders
+	 */
 	private void showSupplyOrders() {
 		for (int i = 0; i < orderDB.getSupplyOrderList().size(); i++) {
 			Order order = (orderDB.getSupplyOrderList().get(i));
@@ -187,6 +210,9 @@ public class CustomerOrderHistoryTab extends JPanel implements ComponentListener
 		}
 	}
 
+	/**
+	 * Actions taken when window resized
+	 */
 	public void componentResized(ComponentEvent e) {
 
 		xPosition = ((((int) mainPanel.getParent().getSize().getWidth()) - xSize) / 2);

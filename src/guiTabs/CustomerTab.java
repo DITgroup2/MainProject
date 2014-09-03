@@ -20,6 +20,9 @@ import order.StockItem;
 import person.Person;
 import retailSystem.PersonDB;
 
+/**
+ * Tab containing customer operations
+ */
 @SuppressWarnings("serial")
 public class CustomerTab extends PersonTab implements MouseListener {
 
@@ -31,6 +34,12 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	private JLabel orderLabel;
 	private boolean automaticItemSelection;
 
+	/**
+	 * Customer tab constructor
+	 * 
+	 * @param personDB
+	 *            The database for people
+	 */
 	public CustomerTab(PersonDB personDB, CustomerOrderTab customerOrderTab) {
 		super(personDB);
 
@@ -59,6 +68,9 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		addAllElements();
 	}
 
+	/**
+	 * Automatically add items to the combo box
+	 */
 	public void addItemsToOrderCombobox(boolean automaticItemSelection) {
 		orderComboboxItems.clear();
 		String item = "";
@@ -80,6 +92,14 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		return newCustomerButton;
 	}
 
+	/**
+	 * Display the selected details in the test field
+	 * 
+	 * @param index
+	 *            The selected index
+	 * @param list
+	 *            The list of customers
+	 */
 	public void setTextField(int index, ArrayList<Person> list) {
 
 		super.setTextField(index, list);
@@ -93,51 +113,67 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		repaint();
 	}
 
+	/**
+	 * Activate a form to edit or add customer details
+	 */
 	public void personDetailsForm() {
 		super.personDetailsForm();
+
+		// If fields not empty
 		if (name != null && address != null && email != null && contactNumber != null) {
 
+			// Edit mode selected
 			if (editMode) {
 				personDB.changePersonDetails(person, name, email, contactNumber, address, 0, null,
 						null, null);
 				setTextField(comboBox.getSelectedIndex(), personDB.getCustomerList());
 				valid = true;
 			}
+			// Adding a new customer
 			else {
 				valid = true;
 				personDB.createNewPerson(person, name, email, contactNumber, address, 0, null,
 						null, null);
 				setTextField(personDB.getCustomerList().size() - 1, personDB.getCustomerList());
 			}
+
+			// Set enabled status of buttons
 			deletePersonButton.setEnabled(true);
-
 			newPersonButton.setEnabled(true);
-			newPersonButton.setVisible(true);
-
 			editPersonButton.setEnabled(true);
+
+			// Set visibility of buttons
 			editPersonButton.setVisible(true);
-
+			newPersonButton.setVisible(true);
 			submitButton.setVisible(false);
-
 			cancelButton.setVisible(false);
 			cancelEditButton.setVisible(false);
 		}
+		// Print an error message
 		else {
 			JOptionPane.showMessageDialog(null, "" + errorMessage);
 		}
+		// Reset the view
 		revalidate();
 		repaint();
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
+		// Inherit action listeners from the super class
 		super.actionPerformed(e);
 
+		// Submit button clicked
 		if (e.getSource() == submitButton) {
 			if (submitButtonMode == 3) {
 				editMode = false;
 				personDetailsForm();
+
+				// If all details entered are valid
 				if (valid) {
 					personDB.getCustomerList();
 					((JTabbedPane) customerOrderTab.getParent())
@@ -159,19 +195,26 @@ public class CustomerTab extends PersonTab implements MouseListener {
 			comboBox.setEnabled(true);
 			// customerOrderTab.fillUpCustomerComboBox();
 		}
+
 		if (valid) {
 			setFieldEditable(false);
 			valid = false;
 		}
+
+		// New person button clicked
 		if (e.getSource() == newPersonButton) {
 			clearTextFields(personDB.getCustomerList());
 			orderComboBox.setEnabled(false);
 			setFieldEditable(true);
 		}
+
+		// Edit button clicked
 		if (e.getSource() == editPersonButton) {
 			orderComboBox.setEnabled(false);
 			setFieldEditable(true);
 		}
+
+		// Cancel button clicked
 		if (e.getSource() == cancelButton) {
 			setFieldEditable(false);
 			orderComboBox.setEnabled(true);
@@ -179,6 +222,8 @@ public class CustomerTab extends PersonTab implements MouseListener {
 			if (!(personDB.getCustomerList().size() > 0))
 				clearTextFields(personDB.getCustomerList());
 		}
+
+		// Cancel button clicekd in edit mod
 		if (e.getSource() == cancelEditButton) {
 			setTextField(comboBox.getSelectedIndex(), personDB.getCustomerList());
 			orderComboBox.setEnabled(true);
@@ -186,21 +231,30 @@ public class CustomerTab extends PersonTab implements MouseListener {
 			if (!(personDB.getCustomerList().size() > 0))
 				clearTextFields(personDB.getCustomerList());
 		}
+
+		// Delete button clicked
 		if (e.getSource() == deletePersonButton) {
 			deletePerson(person, personDB.getCustomerList());
 			customerOrderTab.fillUpCustomerComboBox();
 			validate();
 		}
 
+		// New person button clicked
 		if (e.getSource() == newCustomerButton) {
 			newPersonButton.doClick();
 			submitButtonMode = 3;
 		}
+		// Reset the viev
 		revalidate();
 		repaint();
 
 	}
 
+	/**
+	 * Display the order details
+	 * 
+	 * @param order
+	 */
 	private void showOrderDetails(Order order) {
 		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
 

@@ -1,6 +1,7 @@
 package guiTabs;
 
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -12,15 +13,21 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import order.OrderDB;
@@ -42,15 +49,9 @@ public class MainGUI extends JFrame implements ActionListener {
 	private SupplierTab supplierTab;
 	private CustomerTab customerTab;
 	private JMenuBar menuBar;
-	private JMenu fileMenu;
-	private JMenu userMenu;
-	private JMenu helpMenu;
-	private JMenuItem logoutMenuItem;
-	private JMenuItem exitMenuItem;
-	private JMenuItem openMenuItem;
-	private JMenuItem saveMenuItem;
-	private JMenuItem aboutMenuItem;
-	private JMenuItem howToMenuItem;
+	private JMenu fileMenu, userMenu, helpMenu;
+	private JMenuItem logoutMenuItem, exitMenuItem, openMenuItem, saveMenuItem, aboutMenuItem,
+			howToMenuItem;
 	private StockDBControl stockDBControl;
 	private OrderDB orderDB;
 	private Login login;
@@ -58,6 +59,9 @@ public class MainGUI extends JFrame implements ActionListener {
 	private File file;
 	private BufferedWriter writer;
 	private StringBuilder stringBuilder;
+	private AccountingTab accountingTab;
+	private JPanel pane;
+	private ButtonGroup group;
 
 	public File getFile() {
 		return file;
@@ -107,6 +111,10 @@ public class MainGUI extends JFrame implements ActionListener {
 		return supplyOrderHistorytab;
 	}
 
+	public AccountingTab getAccountingTab() {
+		return accountingTab;
+	}
+
 	/**
 	 * @return the stockDBControl
 	 */
@@ -115,7 +123,16 @@ public class MainGUI extends JFrame implements ActionListener {
 	}
 
 	private JPanel contentPane;
+	private JMenuItem settingsMenuItem;
 
+	/**
+	 * Main GUI constructor
+	 * 
+	 * @param personDB
+	 *            Person database
+	 * @param stockDBControl
+	 *            Stock control database
+	 */
 	public MainGUI(Staff currentlyLoggedInStaff, PersonDB personDB, StockDBControl stockDBControl,
 			Login login, OrderDB orderDB) {
 		Toolkit tk = Toolkit.getDefaultToolkit();
@@ -124,6 +141,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		this.login = login;
 		this.stockDBControl = stockDBControl;
 		this.setVisible(true);
+		group = new ButtonGroup();
 
 		int xSize = 850;
 		int ySize = 580;
@@ -143,27 +161,44 @@ public class MainGUI extends JFrame implements ActionListener {
 		fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
+		int menuTabSize = 16;
+		int menuItemsSize = 16;
 		// Create menu items
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu("File", true);
+		fileMenu.setFont(new Font("Serif", Font.BOLD, menuTabSize));
 		userMenu = new JMenu("User", true);
+		userMenu.setFont(new Font("Serif", Font.BOLD, menuTabSize));
 		helpMenu = new JMenu("Help", true);
+		helpMenu.setFont(new Font("Serif", Font.BOLD, menuTabSize));
+
 		logoutMenuItem = new JMenuItem("Logout");
 		exitMenuItem = new JMenuItem("Exit");
 		openMenuItem = new JMenuItem("Open");
 		saveMenuItem = new JMenuItem("Save");
+		settingsMenuItem = new JMenuItem("Preferences");
 		aboutMenuItem = new JMenuItem("About Group2");
 		howToMenuItem = new JMenuItem("User Guide");
+
+		logoutMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		exitMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		openMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		saveMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		settingsMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		aboutMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
+		howToMenuItem.setFont(new Font("Serif", Font.PLAIN, menuItemsSize));
 
 		// Add menu items to their relevant menu
 		fileMenu.add(openMenuItem);
 		fileMenu.add(saveMenuItem);
+		fileMenu.add(exitMenuItem);
+		userMenu.add(settingsMenuItem);
 		userMenu.add(logoutMenuItem);
-		userMenu.add(exitMenuItem);
 		helpMenu.add(howToMenuItem);
 		helpMenu.add(aboutMenuItem);
 
 		// Add the menus to the menu bar
+
 		menuBar.add(fileMenu);
 		menuBar.add(userMenu);
 		menuBar.add(helpMenu);
@@ -172,6 +207,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		// Append listeners for the menu items
 		logoutMenuItem.addActionListener(this);
 		exitMenuItem.addActionListener(this);
+		settingsMenuItem.addActionListener(this);
 		openMenuItem.addActionListener(this);
 		saveMenuItem.addActionListener(this);
 		aboutMenuItem.addActionListener(this);
@@ -191,49 +227,36 @@ public class MainGUI extends JFrame implements ActionListener {
 				orderDB, this);
 		customerTab = new CustomerTab(personDB, customerOrderTab);
 		productTab = new ProductTab(stockDBControl, personDB, tabbedPane, supplierTab, this);
-
-		customerOrderHistorytab = new CustomerOrderHistoryTab(orderDB);
-
-		supplyOrderHistorytab = new SupplyOrderHistoryTab(orderDB);
-
 		supplyOrderTab = new SupplyOrderTab(currentlyLoggedInStaff, personDB, stockDBControl,
 				orderDB, this);
-
-		/*
-		 * // Add the tabs to the pane tabbedPane.addTab("Customer", null, customerTab, null);
-		 * tabbedPane.addTab("Supplier", null, supplierTab, null); tabbedPane.addTab("Staff", null,
-		 * staffTab, null); tabbedPane.addTab("Product", null, productTab, null); //
-		 * tabbedPane.addTab("Purchase", null, supplyOrderTab, null);
-		 * tabbedPane.addTab("Customer Order", null, customerOrderTab, null);
-		 * tabbedPane.addTab("Stock Control", null, stockControlTab, null);
-		 */
+		customerOrderHistorytab = new CustomerOrderHistoryTab(orderDB);
+		supplyOrderHistorytab = new SupplyOrderHistoryTab(orderDB);
+		accountingTab = new AccountingTab(stockDBControl, orderDB);
 
 		// Add the tabs to the pane
 		tabbedPane.addTab("Customer", new ImageIcon("Images/CustomerIcon.jpg"), customerTab,
-				"Select this tab to perform operations on customers.");
+				"Perform operations on customers.");
 		tabbedPane.addTab("Supplier", new ImageIcon("Images/SupplierIcon.jpg"), supplierTab,
-				"Select this tab to perform operations on suppliers.");
+				"Perform operations on suppliers.");
 		tabbedPane.addTab("Staff", new ImageIcon("Images/StaffIcon.jpg"), staffTab,
-				"Select this tab to perform operations on staff.");
+				"Perform operations on staff.");
 		tabbedPane.addTab("Product", new ImageIcon("Images/ProductIcon.jpg"), productTab,
-				"Select this tab to perform operations on products.");
-		tabbedPane.addTab("Supply Order", null, supplyOrderTab, null);
+				"Perform operations on products.");
 		tabbedPane.addTab("Customer Order", new ImageIcon("Images/CustomerOrderIcon.jpg"),
-				customerOrderTab, "Select this tab to perform operations on customer orders.");
+				customerOrderTab, "Perform operations on customer orders.");
 		tabbedPane.addTab("Stock Control", new ImageIcon("Images/StockControlIcon.jpg"),
-				stockControlTab, "Select this tab to show stock list.");
+				stockControlTab, "Show stock list.");
 		tabbedPane.addTab("Customer Order History", null, customerOrderHistorytab,
-				"Select this tab to show customer order history.");
+				"Show customer order history.");
 		tabbedPane.addTab("Supply Order History", null, supplyOrderHistorytab,
-				"Select this tab to show supply order history.");
-
+				"Show supply order history.");
+		tabbedPane.addTab("Accounts", null, accountingTab, "Show accounts and history.");
 	}
 
-	// Action events for the different menu items
-	// Note: It's bad practice to do action listeners in this way, even though
-	// it
-	// shortens the code.
 	@Override
+	/**
+	 * Action listeners
+	 */
 	public void actionPerformed(ActionEvent event) {
 
 		// Exit option
@@ -245,7 +268,6 @@ public class MainGUI extends JFrame implements ActionListener {
 			if (answer == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
-			System.out.println("Terminate Program!");
 		}
 
 		// Logout option
@@ -274,6 +296,7 @@ public class MainGUI extends JFrame implements ActionListener {
 					+ "John O`Keeffe\n" + "Roland Katona";
 			JOptionPane.showMessageDialog(null, message);
 		}
+		// User guide option
 		if (event.getActionCommand().equals("User Guide")) {
 			try {
 				// Runtime.getRuntime().exec("notepad userGuide.txt");
@@ -290,10 +313,9 @@ public class MainGUI extends JFrame implements ActionListener {
 			}
 		}
 
-		// Save option (need to edit)
+		// Save option
 		if (event.getActionCommand().equals("Save")) {
 			if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-				String str = "ERFERERERE";
 				/*
 				 * try(FileWriter fw = new FileWriter(fileChooser.getSelectedFile()+".txt")) {
 				 * fw.write(sb.toString()); } catch (IOException e) { // Auto-generated catch block
@@ -320,9 +342,93 @@ public class MainGUI extends JFrame implements ActionListener {
 				}
 			}
 		}
+
+		// Preferences option
+		if (event.getActionCommand().equals("Preferences")) {
+			JFrame f = new JFrame();
+			f.setBounds(100, 100, 600, 420);
+			pane = new JPanel();
+			pane.setBorder(new EmptyBorder(5, 5, 5, 5));
+			f.setContentPane(pane);
+			contentPane.setLayout(null);
+
+			JRadioButton rb1, rb2, rb3;
+
+			rb1 = new JRadioButton("Aluminium");
+			rb1.setActionCommand("Aluminium");
+			rb1.setBounds(23, 96, 109, 23);
+			group.add(rb1);
+
+			rb2 = new JRadioButton("HiFi");
+			rb2.setActionCommand("HiFi");
+			rb2.setBounds(23, 122, 109, 23);
+			group.add(rb2);
+
+			rb3 = new JRadioButton("Aero", true);
+			rb3.setActionCommand("Aero");
+			rb3.setBounds(23, 148, 109, 23);
+			group.add(rb3);
+
+			pane.add(rb1);
+			pane.add(rb2);
+			pane.add(rb3);
+
+			JLabel lblTheme = new JLabel("Theme");
+			lblTheme.setBounds(27, 75, 46, 14);
+			pane.add(lblTheme);
+			JButton b = new JButton("Select");
+			b.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent ae) {
+					group.getSelection().getActionCommand();
+				}
+			});
+			f.add(b);
+			f.setVisible(true);
+		}
+		if (event.getActionCommand().equals("Aluminium")) {
+			com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme("Default",
+					"INSERT YOUR LICENSE KEY HERE", "my company");
+			try {
+				UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
+			}
+			catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (event.getActionCommand().equals("HiFi")) {
+			com.jtattoo.plaf.hifi.HiFiLookAndFeel.setTheme("Default",
+					"INSERT YOUR LICENSE KEY HERE", "my company");
+			try {
+				UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
+			}
+			catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (event.getActionCommand().equals("Aero")) {
+			com.jtattoo.plaf.aero.AeroLookAndFeel.setTheme("Gold", "INSERT YOUR LICENSE KEY HERE",
+					"my company");
+			try {
+				UIManager.setLookAndFeel("com.jtattoo.plaf.aero.AeroLookAndFeel");
+			}
+			catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+					| UnsupportedLookAndFeelException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
-	public static void openWebpage(String urlString) {
+	/**
+	 * Open a web page given by the String
+	 * 
+	 * @param urlString
+	 */
+	public void openWebpage(String urlString) {
 		try {
 			File htmlFile = new File(urlString);
 			Desktop.getDesktop().browse(htmlFile.toURI());

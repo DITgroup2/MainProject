@@ -68,8 +68,24 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 	// private final boolean PRIVILEDGED_ACCESS =
 	// RetailSystemDriver.isPriviledged();
 
+	/**
+	 * Product tab constructor
+	 * 
+	 * @param stockDBControl
+	 *            Stock database
+	 * @param personDB
+	 *            Person database
+	 * @param tabbedPane
+	 *            The other tabs in the window
+	 * @param supplierTab
+	 *            Supplier Tab
+	 * @param gui
+	 *            The main containing GUI
+	 */
 	public ProductTab(StockDBControl stockDBControl, PersonDB personDB, JTabbedPane tabbedPane,
 			SupplierTab supplierTab, MainGUI gui) {
+
+		// Initialise the data passed into the constructor
 		this.gui = gui;
 		this.tabbedPane = tabbedPane;
 		this.supplierTab = supplierTab;
@@ -92,6 +108,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		emptiedList = false;
 		submitButtonMode = 0;
 
+		// Set up combo boxes
 		comboboxItems = new Vector<String>();
 		supplierComboboxItems = new Vector<String>();
 		comboboxModel = new DefaultComboBoxModel<String>(comboboxItems);
@@ -99,6 +116,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		comboBox = new JComboBox<String>(comboboxModel);
 		supplierComboBox = new JComboBox<String>(supplierComboBoxModel);
 
+		// Set up buttons
 		newProductButton = new JButton("Add New");
 		editProductButton = new JButton("Edit");
 		deleteProductButton = new JButton("Delete");
@@ -107,6 +125,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		cancelEditButton = new JButton("Cancel");
 		newSupplierProductButton = new JButton();
 
+		// Set up fields
 		nameField = new JTextField();
 		categoryField = new JTextField();
 		supplierField = new JTextField();
@@ -116,6 +135,8 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		descriptionField = new JTextArea(5, 25);
 		descriptionField.setLineWrap(true);
 		descriptionField.setWrapStyleWord(true);
+
+		// Set up labels
 		idLabel = new JLabel("Product ID");
 		idNumberLabel = new JLabel("0");
 		nameLabel = new JLabel("Product Name");
@@ -139,6 +160,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		cancelEditButton.addActionListener(this);
 		cancelEditButton.setVisible(false);
 
+		// Add listeners and set initial visibility
 		idNumberLabel.setBounds(203, 7, 265, 23);
 		nameField.setBounds(200, 30, 265, 23);
 		nameField.setColumns(10);
@@ -149,6 +171,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		retailPriceField.setBounds(200, 185, 265, 23);
 		profitMarginField.setBounds(200, 210, 265, 23);
 
+		// Positioning
 		idLabel.setBounds(59, 10, 93, 20);
 		nameLabel.setBounds(59, 33, 93, 20);
 		categoryLabel.setBounds(59, 58, 93, 20);
@@ -172,6 +195,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		comboBox.setBounds(200, 285, 265, 23);
 		comboBox.addItemListener(this);
 
+		// Finish setting up the GUI and display the elements
 		// comboboxLabel.setBounds(15, 285, 120, 20);
 		supplierComboBox.setBounds(200, 135, 265, 23);
 		supplierComboBox.addItemListener(this);
@@ -184,6 +208,9 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		addAllElements();
 	}
 
+	/**
+	 * Places all elements on the panel
+	 */
 	public void addAllElements() {
 		mainPanel.add(scrollPane);
 		mainPanel.add(categoryField);
@@ -220,12 +247,24 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		// this.add(mainPanel, new GridBagConstraints());
 	}
 
+	/**
+	 * Toggles various buttons on or off
+	 * 
+	 * @param enabled
+	 *            Whether buttons are enabled or not
+	 */
 	public void enableButtons(boolean enabled) {
 		newProductButton.setEnabled(enabled);
 		editProductButton.setEnabled(enabled);
 		deleteProductButton.setEnabled(enabled);
 	}
 
+	/**
+	 * Toggles whether fields can be edited or not
+	 * 
+	 * @param editable
+	 *            Whether fields can be edited or not
+	 */
 	public void setFieldEditable(boolean editable) {
 		nameField.setEditable(editable);
 		categoryField.setEditable(editable);
@@ -236,6 +275,12 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		descriptionField.setEditable(editable);
 	}
 
+	/**
+	 * Clears the data in the fields
+	 * 
+	 * @param list
+	 *            The list to clear
+	 */
 	public void clearTextFields(ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			idNumberLabel.setText("" + Product.getUniqueId());
@@ -253,6 +298,12 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		descriptionField.setText("");
 	}
 
+	/**
+	 * Builds a string for the product description
+	 * 
+	 * @param list
+	 *            The list to refer to
+	 */
 	public void buildProductDetailsString(ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			for (StockItem stockItem : list) {
@@ -271,6 +322,13 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		}
 	}
 
+	/**
+	 * Updates the items in the combo box. This is called when something is removed or added to the
+	 * list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void setSelectedProduct(StockItem stockItem) {
 		addItemsToCombobox(stockDBControl.getStockList());
 		comboBox.setSelectedItem(stockItem.getProduct().getProductName());
@@ -279,6 +337,13 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		repaint();
 	}
 
+	/**
+	 * Updates the items in the combo box. This is called when something is removed or added to the
+	 * list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void addItemsToCombobox(ArrayList<StockItem> list) {
 		comboboxItems.clear();
 		String item = "";
@@ -290,6 +355,12 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		repaint();
 	}
 
+	/**
+	 * Add items to the combo box. This is called when something is removed or added to the list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void addItemsToSupplierCombobox(ArrayList<Person> list) {
 		supplierComboboxItems.clear();
 		String item = "<html><font color='red'>Add New Supplier</font></html>";
@@ -304,6 +375,14 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		repaint();
 	}
 
+	/**
+	 * Set the information displayed in the text field.
+	 * 
+	 * @param index
+	 *            The index to refer to
+	 * @param list
+	 *            The list from which the information is taken
+	 */
 	public void setTextField(int index, ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			stockItem = list.get(index);
@@ -327,7 +406,11 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		comboBox.setSelectedIndex(index);
 	}
 
+	/**
+	 * Deals with fields to enter product details
+	 */
 	public void productDetailsForm() {
+		// Initialise variables
 		name = null;
 		category = null;
 		description = null;
@@ -336,24 +419,28 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		profitMargin = -1;
 		errorMessage = "";
 
+		// Enter a product name
 		if (!nameField.getText().equals("")) {
 			name = nameField.getText();
 		}
 		else {
 			errorMessage = errorMessage + "Product name field cannot be empty!\n";
 		}
+		// Enter a product Category
 		if (!categoryField.getText().equals("")) {
 			category = (categoryField.getText());
 		}
 		else {
 			errorMessage = errorMessage + "Category field cannot be empty!\n";
 		}
+		// Product description
 		if (!descriptionField.getText().equals("")) {
 			description = (descriptionField.getText());
 		}
 		else {
 			errorMessage = errorMessage + "Description number field cannot be empty!\n";
 		}
+		// Supplier price
 		if (!supplierPriceField.getText().equals(""))
 			try {
 				supplierPrice = Double.parseDouble(supplierPriceField.getText());
@@ -366,6 +453,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		else {
 			errorMessage = errorMessage + "Supplier price field cannot be empty!\n";
 		}
+		// Profit margin
 		if (!profitMarginField.getText().equals(""))
 			try {
 				profitMargin = Double.parseDouble(profitMarginField.getText());
@@ -378,8 +466,11 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		else {
 			errorMessage = errorMessage + "Profit margin field cannot be empty!\n";
 		}
+		// Executed if something has been altered or added
 		if (name != null && category != null && description != null && supplierPrice != -1
 				&& profitMargin != -1) {
+
+			// Validate the supplier field
 			if (supplier != null) {
 				valid = true;
 			}
@@ -388,6 +479,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 						"Supplier field cannot be empty!\nPlease select supplier from the list!");
 			}
 
+			// Specific handlers for editing product
 			if (editMode) {
 
 				if (valid) {
@@ -396,16 +488,16 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 					setTextField(comboBox.getSelectedIndex(), stockDBControl.getStockList());
 				}
 			}
-			else {
-
-				if (valid) {
-					stockDBControl.addNewProductToStockList(new Product(name, description,
-							category, supplierPrice, profitMargin, supplier), 10);
-					setTextField(stockDBControl.getStockList().size() - 1, stockDBControl
-							.getStockList());
-					gui.getSupplierTab().addItemsToProductCombobox();
-				}
+			// If not editing an existing product
+			else if (valid) {
+				stockDBControl.addNewProductToStockList(new Product(name, description, category,
+						supplierPrice, profitMargin, supplier), 10);
+				setTextField(stockDBControl.getStockList().size() - 1, stockDBControl
+						.getStockList());
+				gui.getSupplierTab().addItemsToProductCombobox();
 			}
+
+			// Set the appropriate visibility and enabling for the buttons
 			if (valid) {
 				deleteProductButton.setEnabled(true);
 				newProductButton.setEnabled(true);
@@ -417,16 +509,26 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 				cancelEditButton.setVisible(false);
 			}
 		}
-		else {
+		// Print an error message
+		else
 			JOptionPane.showMessageDialog(null, "" + errorMessage);
-		}
 
 		revalidate();
 		repaint();
 	}
 
+	/**
+	 * Removes a product from the list of items in stock
+	 * 
+	 * @param stockItem
+	 *            The item to be removed
+	 * @param list
+	 *            The list from which an item is to be removed
+	 */
 	public void deleteProduct(StockItem stockItem, ArrayList<StockItem> list) {
 
+		// Get the value returned from the JOption Pane (tells which button has been pressed)
+		// and handle it.
 		int answer = JOptionPane.showConfirmDialog(null, "Do you really want to delete "
 				+ stockItem.getProduct().getProductName() + "?", " CONFIRMATION ",
 				JOptionPane.YES_NO_OPTION);// displaying
@@ -450,6 +552,9 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		repaint();
 	}
 
+	/**
+	 * Event handler for combo boxes
+	 */
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {
@@ -471,9 +576,15 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		}
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// Submit clicked
 		if (e.getSource() == submitButton) {
+
+			// Add a new supplier
 			if (submitButtonMode == 3) {
 				editMode = false;
 				productDetailsForm();
@@ -482,6 +593,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 					gui.getSupplierTab().addItemsToProductCombobox();
 				}
 			}
+			// Use an existing supplier
 			else if (submitButtonMode == 2) {
 				editMode = true;
 				productDetailsForm();
@@ -493,11 +605,13 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 			comboBox.setEnabled(true);
 		}
 
+		// If all fields valid
 		if (valid) {
 			setFieldEditable(false);
 			valid = false;
 		}
 
+		// New button clicked
 		if (e.getSource() == newProductButton) {
 			addItemsToSupplierCombobox(personDB.getSupplierList());
 			if (submitButtonMode != 3)
@@ -523,6 +637,7 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 			}
 			setFieldEditable(true);
 		}
+		// Edit button clicked
 		if (e.getSource() == editProductButton) {
 			addItemsToSupplierCombobox(personDB.getSupplierList());
 			supplierComboBox.setSelectedItem(product.getSupplier().getName());
@@ -539,22 +654,34 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 			newProductButton.setEnabled(false);
 			deleteProductButton.setEnabled(false);
 		}
+		// Cancel clicked
 		if (e.getSource() == cancelButton) {
+
+			// Make the fields non editable again
 			supplier = product.getSupplier();
 			supplierComboBox.setSelectedItem(product.getSupplier().getName());
 			setFieldEditable(false);
+
+			// Hide buttons
 			submitButton.setVisible(false);
 			newProductButton.setVisible(true);
 			cancelButton.setVisible(false);
+
+			// Enable the delete and edit buttons as long as the list isn't empty
 			if (!emptiedList) {
 				deleteProductButton.setEnabled(true);
 				editProductButton.setEnabled(true);
 			}
 			comboBox.setEnabled(true);
+
+			// Change the information displayed in the text fields to the last non null item
 			setTextField(stockDBControl.getStockList().size() - 1, stockDBControl.getStockList());
+
+			// Clear the text fields if the database is empty
 			if (!(stockDBControl.getStockList().size() > 0))
 				clearTextFields(stockDBControl.getStockList());
 		}
+		// Cancel clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
 			setFieldEditable(false);
 			submitButton.setVisible(false);
@@ -569,10 +696,12 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 			if (!(stockDBControl.getStockList().size() > 0))
 				clearTextFields(stockDBControl.getStockList());
 		}
+		// Delete product clicked
 		if (e.getSource() == deleteProductButton) {
 			deleteProduct(stockItem, stockDBControl.getStockList());
 		}
 
+		// New button clicked
 		if (e.getSource() == newSupplierProductButton) {
 			newProductButton.doClick();
 			submitButtonMode = 3;
@@ -595,6 +724,9 @@ public class ProductTab extends JPanel implements ActionListener, ItemListener, 
 		return newSupplierProductButton;
 	}
 
+	/**
+	 * For when the window gets resized
+	 */
 	@Override
 	public void componentResized(ComponentEvent e) {
 		supplierComboBox.setSelectedItem("Good Buy");
