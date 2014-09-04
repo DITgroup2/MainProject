@@ -634,7 +634,8 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 
 	private void automaticallyCreateOrders() {
 
-		for (int i = 0; i < random.nextInt((10 - 5) + 1) + 5; i++) {
+		// for (int i = 0; i < random.nextInt((10 - 5) + 1) + 5; i++) {
+		for (int i = 0; i < 100; i++) {
 			driver.getOrderDB().getCustomerOrderList().add(
 					new Order(driver.getPersonDB().getRandomStaff(), (Customer) driver
 							.getPersonDB().getRandomCustomer(), getRandomOrderItemList(true),
