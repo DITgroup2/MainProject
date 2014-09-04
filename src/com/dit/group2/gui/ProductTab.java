@@ -154,6 +154,20 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		comboBox.setBounds(200, 285, 265, 23);
 		comboBox.addItemListener(this);
 
+		newProductButton.setToolTipText("Click to add a product.");
+		editProductButton.setToolTipText("Click to edit the details of the current product.");
+		deleteProductButton.setToolTipText("Click to delete the current product.");
+		cancelEditButton.setToolTipText("Click to cancel editing the current product.");
+		cancelButton.setToolTipText("Click to exit the new product screen.");
+		submitButton.setToolTipText("Submit changes/new product.");
+
+		// Set tool tips for combobox items
+		comboBox.setToolTipText("Click to view the details of another product.");
+
+		// Other tool tips...
+		retailPriceField
+				.setToolTipText("Retail Price = Supply Price + (Supply Price)*(Profit Margin)");
+
 		// Finish setting up the GUI and display the elements
 		// comboboxLabel.setBounds(15, 285, 120, 20);
 		supplierComboBox.setBounds(200, 135, 265, 23);

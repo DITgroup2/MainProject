@@ -166,16 +166,22 @@ public class MainGUI extends JFrame implements ActionListener {
 				"Select this tab to show customer order.");
 		customerOrderTabbedPane.addTab("Customer Order History", null, customerOrderHistorytab,
 				"Select this tab to show customer order history.");
-		tabbedPane.addTab("Customer Order", null, customerOrderTabbedPane, null);
-		tabbedPane.addTab("Supply Order", null, supplyOrderTabbedPane, null);
+		tabbedPane
+				.addTab("Customer Order", new ImageIcon("Images/CustomerOrderIcon.jpg"),
+						customerOrderTabbedPane,
+						"Select this tab to view details on orders for customers.");
+		tabbedPane.addTab("Supply Order", new ImageIcon("Images/SupplyOrderIcon.jpg"),
+				supplyOrderTabbedPane, "Select this tab to view details on orders from suppliers.");
+
+		// Add tool tips to menu items
+		fileMenu.setToolTipText("<html>This is the file menu.<br/> Click to open previous files, or to save current progress.</html>");
+		userMenu.setToolTipText("<html>This is the user menu.<br/> Click to logout, or to exit the program.</html>");
+		helpMenu.setToolTipText("<html>This is the help menu.<br/> Click to access the user guide.</html>");
 
 		setVisible(true);
 	}
 
-	// Action events for the different menu items
-	// Note: It's bad practice to do action listeners in this way, even though
-	// it
-	// shortens the code.
+	/** Action events for the different menu items */
 	@Override
 	public void actionPerformed(ActionEvent event) {
 

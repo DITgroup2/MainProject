@@ -122,6 +122,18 @@ public class SupplierTab extends PersonTab {
 		contactNameLabel.setBounds(59, 160, 93, 14);
 		vatNumberLabel.setBounds(59, 185, 94, 14);
 
+		// Set tool tips for clickable buttons
+		newPersonButton.setToolTipText("Click to add a new supplier.");
+		editPersonButton.setToolTipText("Click to edit the current supplier.");
+		deletePersonButton.setToolTipText("Click to delete the current supplier.");
+		cancelEditButton.setToolTipText("Click to cancel editing the current supplier.");
+		cancelButton.setToolTipText("Click to exit the new supplier screen.");
+		submitButton.setToolTipText("Submit changes/new supplier.");
+
+		// Set tool tips for combobox items
+		// orderComboBox.setToolTipText("BLAHHHHHH");
+		comboBox.setToolTipText("Click to view the details of another supplier.");
+
 		// Finish setting up the tab
 		setTextField(0, driver.getPersonDB().getSupplierList());
 		setFieldEditable(false);

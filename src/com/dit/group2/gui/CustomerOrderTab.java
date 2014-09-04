@@ -101,6 +101,18 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		setLayout(null);
 		setVisible(true);
 
+		// Set tool tips for clickable buttons
+		addButton.setToolTipText("Click to add an order for this customer.");
+		removeButton.setToolTipText("Click to remove an order.");
+		processButton.setToolTipText("Click to process this customer's order.");
+		cancelButton.setToolTipText("Click to remove all orders for this customer.");
+
+		// Set tool tips for combobox items
+		customerComboBox.setToolTipText("Click to select which customer to order for.");
+		productComboBox.setToolTipText("Click to select which product to order.");
+
+		// Other tool tips...
+
 		random = new Random();
 		automaticallyCreateOrders();
 	}

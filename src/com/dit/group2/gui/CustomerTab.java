@@ -63,6 +63,16 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		mainPanel.add(orderComboBox);
 		mainPanel.add(orderLabel);
 
+		// Set tool tips for clickable buttons
+		newPersonButton.setToolTipText("Click to add a new customer.");
+		editPersonButton.setToolTipText("Click to edit the current customer.");
+		deletePersonButton.setToolTipText("Click to delete the current customer.");
+		cancelEditButton.setToolTipText("Click to cancel editing the current customer.");
+		cancelButton.setToolTipText("Click to exit the new customer screen.");
+		submitButton.setToolTipText("Submit changes/new customer.");
+		// Set tool tips for combobox items
+		comboBox.setToolTipText("Click to view the details of another customer.");
+
 		setTextField(0, driver.getPersonDB().getCustomerList());
 		setFieldEditable(false);
 		addAllElements();

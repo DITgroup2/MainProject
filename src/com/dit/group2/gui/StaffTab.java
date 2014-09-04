@@ -96,6 +96,21 @@ public class StaffTab extends PersonTab {
 		passwordLabel1.setBounds(59, 185, 93, 20);
 		passwordLabel2.setBounds(59, 210, 130, 20);
 
+		// Set tool tips for clickable buttons
+		newPersonButton.setToolTipText("Click to add a staff member.");
+		editPersonButton.setToolTipText("Click to edit the details of the current staff member.");
+		deletePersonButton.setToolTipText("Click to delete the current staff member.");
+		cancelEditButton.setToolTipText("Click to cancel editing the current staff member.");
+		cancelButton.setToolTipText("Click to exit the new staff member screen.");
+		submitButton.setToolTipText("Submit changes/new staff member.");
+
+		// Set tool tips for combobox items
+		comboBox.setToolTipText("Click to view the details of another staff member.");
+
+		// Other tool tips...
+		accessLevelField
+				.setToolTipText("Access levels: 1) Employee, 2) Manager (Privileged access)");
+
 		// Finish adding elements to the panel
 		setTextField(0, driver.getPersonDB().getStaffList());
 		setFieldEditable(false);

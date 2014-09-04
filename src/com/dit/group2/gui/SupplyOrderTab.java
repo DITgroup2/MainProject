@@ -105,6 +105,18 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		orderingList();
 		refreshTab(0);
 
+		// Set tool tips for clickable buttons
+		addButton.setToolTipText("Click to add an order from this supplier.");
+		removeButton.setToolTipText("Click to remove an order.");
+		processButton.setToolTipText("Click to process the order from this supplier.");
+		cancelButton.setToolTipText("Click to remove all orders from this supplier.");
+
+		// Set tool tips for combobox items
+		productComboBox.setToolTipText("Click to select which product to order.");
+		supplierComboBox.setToolTipText("Click to select which supplier to order from.");
+
+		// Other tool tips...
+
 		setLayout(null);
 		setVisible(true);
 	}
