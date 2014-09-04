@@ -61,6 +61,12 @@ public class MainGUI extends JFrame implements ActionListener {
 	public MainGUI() {
 	}
 
+	/**
+	 * Main GUI constructor
+	 * 
+	 * @param currentlyLoggedInStaff
+	 * @param driver
+	 */
 	public MainGUI(Staff currentlyLoggedInStaff, RetailSystemDriver driver) {
 		super();
 
@@ -227,7 +233,7 @@ public class MainGUI extends JFrame implements ActionListener {
 			}
 		}
 
-		// Save option (need to edit)
+		// Save option
 		if (event.getActionCommand().equals("Save")) {
 			if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				String str = "ERFERERERE";

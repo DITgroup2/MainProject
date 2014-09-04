@@ -54,16 +54,21 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 	// private final boolean PRIVILEDGED_ACCESS =
 	// RetailSystemDriver.isPriviledged();
 
+	/**
+	 * Product tab constructor
+	 * 
+	 * @param driver
+	 */
 	public ProductTab(RetailSystemDriver driver) {
+		// Initialise the data passed into the constructor
 		super();
 		this.driver = driver;
-
 		titleLabel.setText("Product Form");
-
 		valid = false;
 		emptiedList = false;
 		submitButtonMode = 0;
 
+		// Set up combo boxes
 		comboboxItems = new Vector<String>();
 		supplierComboboxItems = new Vector<String>();
 		comboboxModel = new DefaultComboBoxModel<String>(comboboxItems);
@@ -71,6 +76,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		comboBox = new JComboBox<String>(comboboxModel);
 		supplierComboBox = new JComboBox<String>(supplierComboBoxModel);
 
+		// Set up buttons
 		newProductButton = new JButton("Add New");
 		editProductButton = new JButton("Edit");
 		deleteProductButton = new JButton("Delete");
@@ -79,6 +85,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		cancelEditButton = new JButton("Cancel");
 		newSupplierProductButton = new JButton();
 
+		// Set up fields
 		nameField = new JTextField();
 		categoryField = new JTextField();
 		supplierField = new JTextField();
@@ -88,6 +95,8 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		descriptionField = new JTextArea(5, 25);
 		descriptionField.setLineWrap(true);
 		descriptionField.setWrapStyleWord(true);
+
+		// Set up labels
 		idLabel = new JLabel("Product ID");
 		idNumberLabel = new JLabel("0");
 		nameLabel = new JLabel("Product Name");
@@ -99,6 +108,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		profitMarginLabel = new JLabel("Profit Margin");
 		comboboxLabel = new JLabel("Product");
 
+		// Add listeners and set initial visibility
 		addComponentListener(this);
 		newSupplierProductButton.addActionListener(this);
 		newProductButton.addActionListener(this);
@@ -111,6 +121,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		cancelEditButton.addActionListener(this);
 		cancelEditButton.setVisible(false);
 
+		// Positioning
 		idNumberLabel.setBounds(203, 7, 265, 23);
 		nameField.setBounds(200, 30, 265, 23);
 		nameField.setColumns(10);
@@ -120,7 +131,6 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		supplierPriceField.setBounds(200, 160, 265, 23);
 		retailPriceField.setBounds(200, 185, 265, 23);
 		profitMarginField.setBounds(200, 210, 265, 23);
-
 		idLabel.setBounds(59, 10, 93, 20);
 		nameLabel.setBounds(59, 33, 93, 20);
 		categoryLabel.setBounds(59, 58, 93, 20);
@@ -144,6 +154,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		comboBox.setBounds(200, 285, 265, 23);
 		comboBox.addItemListener(this);
 
+		// Finish setting up the GUI and display the elements
 		// comboboxLabel.setBounds(15, 285, 120, 20);
 		supplierComboBox.setBounds(200, 135, 265, 23);
 		supplierComboBox.addItemListener(this);
@@ -156,6 +167,9 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		addAllElements();
 	}
 
+	/**
+	 * Places all elements on the panel
+	 */
 	public void addAllElements() {
 		mainPanel.add(scrollPane);
 		mainPanel.add(categoryField);
@@ -187,12 +201,24 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		add(titleLabel);
 	}
 
+	/**
+	 * Toggles various buttons on or off
+	 * 
+	 * @param enabled
+	 *            Whether buttons are enabled or not
+	 */
 	public void enableButtons(boolean enabled) {
 		newProductButton.setEnabled(enabled);
 		editProductButton.setEnabled(enabled);
 		deleteProductButton.setEnabled(enabled);
 	}
 
+	/**
+	 * Toggles whether fields can be edited or not
+	 * 
+	 * @param editable
+	 *            Whether fields can be edited or not
+	 */
 	public void setFieldEditable(boolean editable) {
 		nameField.setEditable(editable);
 		categoryField.setEditable(editable);
@@ -203,6 +229,12 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		descriptionField.setEditable(editable);
 	}
 
+	/**
+	 * Clears the data in the fields
+	 * 
+	 * @param list
+	 *            The list to clear
+	 */
 	public void clearTextFields(ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			idNumberLabel.setText("" + Product.getUniqueId());
@@ -220,6 +252,12 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		descriptionField.setText("");
 	}
 
+	/**
+	 * Builds a string for the product description
+	 * 
+	 * @param list
+	 *            The list to refer to
+	 */
 	public void buildProductDetailsString(ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			for (StockItem stockItem : list) {
@@ -243,6 +281,13 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		}
 	}
 
+	/**
+	 * Updates the items in the combo box. This is called when something is removed or added to the
+	 * list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void setSelectedProduct(StockItem stockItem) {
 		addItemsToCombobox(driver.getStockDB().getStockList());
 		comboBox.setSelectedItem(stockItem.getProduct().getProductName());
@@ -251,6 +296,13 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		repaint();
 	}
 
+	/**
+	 * Updates the items in the combo box. This is called when something is removed or added to the
+	 * list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void addItemsToCombobox(ArrayList<StockItem> list) {
 		comboboxItems.clear();
 		String item = "";
@@ -262,6 +314,12 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		repaint();
 	}
 
+	/**
+	 * Add items to the combo box. This is called when something is removed or added to the list
+	 * 
+	 * @param list
+	 *            The updated list the combo box refers to
+	 */
 	public void addItemsToSupplierCombobox(ArrayList<Person> list) {
 		supplierComboboxItems.clear();
 		String item = "<html><font color='red'>Add New Supplier</font></html>";
@@ -292,6 +350,14 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		return -1;
 	}
 
+	/**
+	 * Set the information displayed in the text field.
+	 * 
+	 * @param index
+	 *            The index to refer to
+	 * @param list
+	 *            The list from which the information is taken
+	 */
 	public void setTextField(int index, ArrayList<StockItem> list) {
 		if (list.size() > 0) {
 			stockItem = list.get(index);
@@ -316,6 +382,9 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		comboBox.setSelectedIndex(index);
 	}
 
+	/**
+	 * Deals with fields to enter product details
+	 */
 	public void productDetailsForm() {
 		name = null;
 		supplier = null;
@@ -327,6 +396,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		errorMessage = "";
 		supplierLabel.setForeground(Color.red);
 
+		// Enter a product name
 		if (!nameField.getText().equals("")) {
 			name = nameField.getText();
 			nameLabel.setForeground(Color.black);
@@ -335,6 +405,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			errorMessage = errorMessage + "Product name field cannot be empty!\n";
 			nameLabel.setForeground(Color.red);
 		}
+		// Enter a product Category
 		if (!categoryField.getText().equals("")) {
 			category = (categoryField.getText());
 			categoryLabel.setForeground(Color.black);
@@ -343,6 +414,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			errorMessage = errorMessage + "Category field cannot be empty!\n";
 			categoryLabel.setForeground(Color.red);
 		}
+		// Product description
 		if (!descriptionField.getText().equals("")) {
 			description = (descriptionField.getText());
 			descriptionLabel.setForeground(Color.black);
@@ -351,6 +423,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			errorMessage = errorMessage + "Description number field cannot be empty!\n";
 			descriptionLabel.setForeground(Color.red);
 		}
+		// Supplier price
 		if (!supplierPriceField.getText().equals(""))
 			try {
 				supplierPrice = Double.parseDouble(supplierPriceField.getText());
@@ -366,6 +439,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			errorMessage = errorMessage + "Supplier price field cannot be empty!\n";
 			supplierPriceLabel.setForeground(Color.red);
 		}
+		// Profit margin
 		if (!profitMarginField.getText().equals(""))
 			try {
 				profitMargin = Double.parseDouble(profitMarginField.getText());
@@ -381,12 +455,14 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			errorMessage = errorMessage + "Profit margin field cannot be empty!\n";
 			profitMarginLabel.setForeground(Color.red);
 		}
+		// Executed if something has been altered or added
 		if (name != null && category != null && description != null && supplierPrice != -1
 				&& profitMargin != -1) {
 			if (getIndex(driver.getPersonDB().getSupplierList()) > -1)
 				supplier = (Supplier) driver.getPersonDB().getSupplierList().get(
 						getIndex(driver.getPersonDB().getSupplierList()));
 
+			// Validate the supplier field
 			if (supplier != null) {
 				valid = true;
 				supplierLabel.setForeground(Color.black);
@@ -397,6 +473,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 				supplierLabel.setForeground(Color.red);
 			}
 
+			// Specific handlers for editing product
 			if (editMode) {
 
 				if (valid) {
@@ -406,17 +483,16 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 					setTextField(comboBox.getSelectedIndex(), driver.getStockDB().getStockList());
 				}
 			}
-			else {
-
-				if (valid) {
-					driver.getStockDB().addNewProductToStockList(
-							new Product(name, description, category, supplierPrice, profitMargin,
-									supplier), 10);
-					setTextField(driver.getStockDB().getStockList().size() - 1, driver.getStockDB()
-							.getStockList());
-					driver.getGui().getSupplierTab().addItemsToProductCombobox();
-				}
+			// If not editing an existing product
+			else if (valid) {
+				driver.getStockDB().addNewProductToStockList(
+						new Product(name, description, category, supplierPrice, profitMargin,
+								supplier), 10);
+				setTextField(driver.getStockDB().getStockList().size() - 1, driver.getStockDB()
+						.getStockList());
+				driver.getGui().getSupplierTab().addItemsToProductCombobox();
 			}
+			// Set the appropriate visibility and enabling for the buttons
 			if (valid) {
 				deleteProductButton.setEnabled(true);
 				newProductButton.setEnabled(true);
@@ -428,6 +504,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 				cancelEditButton.setVisible(false);
 			}
 		}
+		// Print an error message
 		else {
 			JOptionPane.showMessageDialog(null, "" + errorMessage);
 		}
@@ -436,8 +513,18 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		repaint();
 	}
 
+	/**
+	 * Removes a product from the list of items in stock
+	 * 
+	 * @param stockItem
+	 *            The item to be removed
+	 * @param list
+	 *            The list from which an item is to be removed
+	 */
 	public void deleteProduct(StockItem stockItem, ArrayList<StockItem> list) {
 
+		// Get the value returned from the JOption Pane (tells which button has been pressed)
+		// and handle it.
 		int answer = JOptionPane.showConfirmDialog(null, "Do you really want to delete "
 				+ stockItem.getProduct().getProductName() + "?", " CONFIRMATION ",
 				JOptionPane.YES_NO_OPTION);
@@ -458,6 +545,9 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		repaint();
 	}
 
+	/**
+	 * Event handler for combo boxes
+	 */
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {
@@ -480,9 +570,14 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 		}
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// Submit clicked
 		if (e.getSource() == submitButton) {
+			// Add a new supplier
 			if (submitButtonMode == 3) {
 				editMode = false;
 				productDetailsForm();
@@ -492,16 +587,19 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 
 				}
 			}
+			// Use an existing supplier
 			else if (submitButtonMode == 2) {
 				editMode = true;
 				productDetailsForm();
 			}
+			// Create a new supplier
 			else if (submitButtonMode == 1) {
 				editMode = false;
 				productDetailsForm();
 			}
 			comboBox.setEnabled(true);
 
+			// If all fields valid
 			if (valid) {
 				driver.getGui().getSupplierTab().addItemsToProductCombobox();
 				submitButtonMode = 1;
@@ -509,6 +607,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 				valid = false;
 			}
 		}
+		// New button clicked
 		if (e.getSource() == newProductButton) {
 			addItemsToSupplierCombobox(driver.getPersonDB().getSupplierList());
 			if (submitButtonMode == 3) {
@@ -546,6 +645,7 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			}
 			setFieldEditable(true);
 		}
+		// Edit button clicked
 		if (e.getSource() == editProductButton) {
 			addItemsToSupplierCombobox(driver.getPersonDB().getSupplierList());
 			supplierComboBox.setEnabled(true);
@@ -564,25 +664,36 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			newProductButton.setEnabled(false);
 			deleteProductButton.setEnabled(false);
 		}
+		// Cancel clicked
 		if (e.getSource() == cancelButton) {
+			// Make the fields non editable again
 			supplier = product.getSupplier();
 			supplierComboBox.setSelectedItem("\t" + product.getSupplier().getId() + " \t - \t "
 					+ product.getSupplier().getName());
 			setFieldEditable(false);
+
+			// Hide buttons
 			submitButton.setVisible(false);
 			newProductButton.setVisible(true);
 			cancelButton.setVisible(false);
+
+			// Enable the delete and edit buttons as long as the list isn't empty
 			if (!emptiedList) {
 				deleteProductButton.setEnabled(true);
 				editProductButton.setEnabled(true);
 			}
 			comboBox.setEnabled(true);
+
+			// Change the information displayed in the text fields to the last non null item
 			setTextField(driver.getStockDB().getStockList().size() - 1, driver.getStockDB()
 					.getStockList());
+
+			// Clear the text fields if the database is empty
 			if (!(driver.getStockDB().getStockList().size() > 0))
 				clearTextFields(driver.getStockDB().getStockList());
 			submitButtonMode = 1;
 		}
+		// Cancel clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
 			setFieldEditable(false);
 			submitButton.setVisible(false);
@@ -597,10 +708,12 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			if (!(driver.getStockDB().getStockList().size() > 0))
 				clearTextFields(driver.getStockDB().getStockList());
 		}
+		// Cancel clicked in edit mode
 		if (e.getSource() == deleteProductButton) {
 			deleteProduct(stockItem, driver.getStockDB().getStockList());
 		}
 
+		// New button clicked
 		if (e.getSource() == newSupplierProductButton) {
 			// supplierComboBox.setSelectedItem("\t"+
 			// supplier.getId()+" \t - \t "+supplier.getName());

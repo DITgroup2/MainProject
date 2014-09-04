@@ -154,8 +154,11 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	 */
 	public void personDetailsForm() {
 		super.personDetailsForm();
+
+		// If fields not empty
 		if (name != null && address != null && email != null && contactNumber != null) {
 
+			// Edit mode selected
 			if (editMode) {
 				driver.getPersonDB().changePersonDetails(person, name, email, contactNumber,
 						address, 0, null, null, null);
@@ -163,6 +166,7 @@ public class CustomerTab extends PersonTab implements MouseListener {
 						.getCustomerList());
 				valid = true;
 			}
+			// Adding a new customer
 			else {
 				valid = true;
 				driver.getPersonDB().createNewPerson(person, name, email, contactNumber, address,
@@ -170,18 +174,22 @@ public class CustomerTab extends PersonTab implements MouseListener {
 				setTextField(driver.getPersonDB().getCustomerList().size() - 1, driver
 						.getPersonDB().getCustomerList());
 			}
+			// Set enabled status of buttons
 			deletePersonButton.setEnabled(true);
 			newPersonButton.setEnabled(true);
-			newPersonButton.setVisible(true);
 			editPersonButton.setEnabled(true);
+
+			// Set visibility of buttons
 			editPersonButton.setVisible(true);
 			submitButton.setVisible(false);
 			cancelButton.setVisible(false);
 			cancelEditButton.setVisible(false);
+			newPersonButton.setVisible(true);
 		}
 		else {
 			JOptionPane.showMessageDialog(null, "" + errorMessage);
 		}
+		// Reset the view
 		revalidate();
 		repaint();
 	}
@@ -193,6 +201,7 @@ public class CustomerTab extends PersonTab implements MouseListener {
 
 		// Submit button clicked
 		if (e.getSource() == submitButton) {
+			// New mode, redirect to supplier tab to create new supplier
 			if (submitButtonMode == 3) {
 				editMode = false;
 				personDetailsForm();
@@ -208,10 +217,12 @@ public class CustomerTab extends PersonTab implements MouseListener {
 							driver.getPersonDB().getCustomerList().size());
 				}
 			}
+			// Edit mode active
 			else if (submitButtonMode == 2) {
 				editMode = true;
 				personDetailsForm();
 			}
+			// New mode active, existing supplier
 			else if (submitButtonMode == 1) {
 				editMode = false;
 				personDetailsForm();

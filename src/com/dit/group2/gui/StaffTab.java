@@ -1,8 +1,5 @@
 package com.dit.group2.gui;
 
-//test
-//another test comment
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -24,6 +21,14 @@ public class StaffTab extends PersonTab {
 	private JTextField passwordField1, passwordField2, accessLevelField;
 	private JLabel passwordLabel1, passwordLabel2, accessLevelLabel;
 
+	/**
+	 * Set up the text fields
+	 * 
+	 * @param index
+	 *            The selected index (default value)
+	 * @param list
+	 *            The list of staff
+	 */
 	public void setTextField(int index, ArrayList<Person> list) {
 
 		super.setTextField(index, list);
@@ -37,6 +42,12 @@ public class StaffTab extends PersonTab {
 		repaint();
 	}
 
+	/**
+	 * Clear everything in the fields
+	 * 
+	 * @param list
+	 *            The list of staff
+	 */
 	public void clearTextFields(ArrayList<Person> list) {
 		super.clearTextFields(list);
 
@@ -51,10 +62,9 @@ public class StaffTab extends PersonTab {
 	 * Create the panel.
 	 * 
 	 * @param driver
-	 *            TODO
 	 */
 	public StaffTab(RetailSystemDriver driver) {
-
+		// Field and label setup
 		super(driver);
 		titleLabel.setText("Staff Form");
 		enablePasswordEdit = false;
@@ -67,11 +77,13 @@ public class StaffTab extends PersonTab {
 		passwordField2 = new JTextField();
 		accessLevelField = new JTextField();
 
+		// Initial visibility
 		passwordField1.setVisible(false);
 		passwordField2.setVisible(false);
 		passwordLabel1.setVisible(false);
 		passwordLabel2.setVisible(false);
 
+		// Dimensions for elements
 		accessLevelField.setBounds(200, 160, 265, 23);
 		accessLevelField.setColumns(10);
 		passwordField2.setBounds(200, 185, 265, 23);
@@ -84,12 +96,16 @@ public class StaffTab extends PersonTab {
 		passwordLabel1.setBounds(59, 185, 93, 20);
 		passwordLabel2.setBounds(59, 210, 130, 20);
 
+		// Finish adding elements to the panel
 		setTextField(0, driver.getPersonDB().getStaffList());
 		setFieldEditable(false);
 		addAllElements();
 
 	}
 
+	/**
+	 * Add every element to the panel
+	 */
 	public void addAllElements() {
 		super.addAllElements();
 
@@ -106,11 +122,20 @@ public class StaffTab extends PersonTab {
 		 */
 	}
 
+	/**
+	 * Toggle wether you can edit fields or not
+	 * 
+	 * @param editable
+	 *            The editable status of the fields
+	 */
 	public void setFieldEditable(boolean editable) {
 		super.setFieldEditable(editable);
 		accessLevelField.setEditable(editable);
 	}
 
+	/**
+	 * Open a form for editing or creating details
+	 */
 	public void personDetailsForm() {
 		super.personDetailsForm();
 		int aLevel = 0;
@@ -118,6 +143,7 @@ public class StaffTab extends PersonTab {
 		password = null;
 		password2 = null;
 
+		// Access level
 		if (!accessLevelField.getText().equals("")) {
 			accessLevel = accessLevelField.getText();
 			accessLevelLabel.setForeground(Color.black);
@@ -126,6 +152,7 @@ public class StaffTab extends PersonTab {
 			errorMessage = errorMessage + "Access level field cannot be empty!\n";
 			accessLevelLabel.setForeground(Color.red);
 		}
+		// Password field
 		if (!passwordField1.getText().equals("") && !passwordField2.getText().equals("")) {
 			password = (passwordField1.getText());
 			password2 = (passwordField2.getText());
@@ -137,8 +164,11 @@ public class StaffTab extends PersonTab {
 			passwordLabel1.setForeground(Color.red);
 			passwordLabel2.setForeground(Color.red);
 		}
+		// Execute if fields are not empty
 		if (name != null && address != null && email != null && contactNumber != null
 				&& accessLevel != null && password != null && password2 != null) {
+
+			// Check that passwords match
 			if (!password.equals(password2)) {
 				JOptionPane.showMessageDialog(null, "Passwords do not match!!!");
 				passwordLabel1.setForeground(Color.red);
@@ -153,6 +183,7 @@ public class StaffTab extends PersonTab {
 					e.printStackTrace();
 				}
 
+				// Validate the access level
 				if (RetailSystemDriver.validateAccessLevel(accessLevel)) {
 
 					valid = true;
@@ -162,6 +193,7 @@ public class StaffTab extends PersonTab {
 					errorMessage = errorMessage + "Only access level 1 or 2 are valid!\n";
 					accessLevelLabel.setForeground(Color.red);
 				}
+				// Edit mode selected
 				if (editMode) {
 					System.out.println(valid);
 					if (valid) {
@@ -172,25 +204,24 @@ public class StaffTab extends PersonTab {
 								.getPersonDB().getStaffList());
 					}
 				}
-				else {
-					if (valid) {
-						driver.getPersonDB().createNewPerson(person, name, email, contactNumber,
-								address, aLevel, password, null, null);
-						setTextField(driver.getPersonDB().getStaffList().size() - 1, driver
-								.getPersonDB().getStaffList());
-					}
+				else if (valid) {
+					driver.getPersonDB().createNewPerson(person, name, email, contactNumber,
+							address, aLevel, password, null, null);
+					setTextField(driver.getPersonDB().getStaffList().size() - 1, driver
+							.getPersonDB().getStaffList());
+
 				}
+				// If all fields have valid inputs
 				if (valid) {
+					// Enable buttons
 					deletePersonButton.setEnabled(true);
-
-					newPersonButton.setEnabled(true);
-					newPersonButton.setVisible(true);
-
 					editPersonButton.setEnabled(true);
+					newPersonButton.setEnabled(true);
+
+					// Set visibility for buttons
+					newPersonButton.setVisible(true);
 					editPersonButton.setVisible(true);
-
 					submitButton.setVisible(false);
-
 					cancelButton.setVisible(false);
 					cancelEditButton.setVisible(false);
 				}
@@ -204,6 +235,9 @@ public class StaffTab extends PersonTab {
 
 	}
 
+	/**
+	 * Toggles the visiblilty of the password fields
+	 */
 	public void togglePasswordField() {
 		if (!enablePasswordEdit) {
 			passwordField1.setVisible(true);
@@ -220,11 +254,16 @@ public class StaffTab extends PersonTab {
 		enablePasswordEdit = !enablePasswordEdit;
 	}
 
+	/**
+	 * Action listeners
+	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
+		// Use action listeners from the superclass
 		super.actionPerformed(e);
 
+		// Submit button clicked
 		if (e.getSource() == submitButton) {
 			if (submitButtonMode == 2) {
 				editMode = true;
@@ -237,12 +276,14 @@ public class StaffTab extends PersonTab {
 			comboBox.setEnabled(true);
 		}
 
+		// Valid fields
 		if (valid) {
 			// super.actionPerformed(e);
 			togglePasswordField();
 			setFieldEditable(false);
 			valid = false;
 		}
+		// New button clicked
 		if (e.getSource() == newPersonButton) {
 			clearTextFields(driver.getPersonDB().getStaffList());
 			super.actionPerformed(e);
@@ -250,11 +291,13 @@ public class StaffTab extends PersonTab {
 			togglePasswordField();
 
 		}
+		// Edit button clicked
 		if (e.getSource() == editPersonButton) {
 			// super.actionPerformed(e);
 			togglePasswordField();
 			setFieldEditable(true);
 		}
+		// Cancel button clicked
 		if (e.getSource() == cancelButton) {
 
 			setFieldEditable(false);
@@ -264,6 +307,7 @@ public class StaffTab extends PersonTab {
 			if (!(driver.getPersonDB().getStaffList().size() > 0))
 				clearTextFields(driver.getPersonDB().getStaffList());
 		}
+		// Cancel button clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
 			setTextField(getIndex(driver.getPersonDB().getStaffList()), driver.getPersonDB()
 					.getStaffList());
@@ -273,6 +317,7 @@ public class StaffTab extends PersonTab {
 				clearTextFields(driver.getPersonDB().getStaffList());
 		}
 
+		// Delete button clicked
 		if (e.getSource() == deletePersonButton) {
 			deletePerson(person, driver.getPersonDB().getStaffList());
 		}
@@ -286,6 +331,9 @@ public class StaffTab extends PersonTab {
 		return index;
 	}
 
+	/**
+	 * Listener for the combo box
+	 */
 	@Override
 	public void itemStateChanged(ItemEvent event) {
 		if (event.getStateChange() == ItemEvent.SELECTED) {
