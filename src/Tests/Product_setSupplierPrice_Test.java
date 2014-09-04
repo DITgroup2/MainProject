@@ -1,5 +1,9 @@
 package Tests;
 
+//this is a test of commiting 4/09/2014
+
+//this is a test of a second commit 4/09/2014
+
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
