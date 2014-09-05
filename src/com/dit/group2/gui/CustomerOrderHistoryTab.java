@@ -117,24 +117,19 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	 * @param order
 	 */
 	private void showOrderDetails(Order order) {
-		String status, shownOption = "Set Processed";
-		boolean isReturned = false;
+		String status, shownOption;
 
 		if (order.getStatus()) {
-			if (isReturned) {
-				status = new String();
-				status = "Returned";
-			}
-			else {
-				status = new String();
-				status = "Processed";
-			}
+			status = new String();
+			status = "Processed";
+
 			shownOption = new String();
 			shownOption = "Return";
 		}
 		else {
 			status = new String();
 			shownOption = new String();
+
 			status = "Pending";
 			shownOption = "Set Processed";
 		}
@@ -157,36 +152,12 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 				+ order.getGrandTotalOfOrder() + "\n";
 
 		Object[] options = { "OK", shownOption };
-		if (order.getStatus()) {
-			int n = JOptionPane.showOptionDialog(null, orderDetailsMessage, "ORDER ID: "
-					+ (order.getId()) + "    STAFF ID: "
-					+ order.getCurrentlyLoggedInStaff().getId()
-			/* + " STATUS : " + order.isStatus() */, JOptionPane.YES_NO_OPTION,
-					JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-			if (n == 1) {
-				order.setStatus(true);
-				if (shownOption.equals("Return")) {
-					isReturned = true;
-				}
-			}
-		}
-		if (order.getStatus()) {
-			if (isReturned) {
-				status = new String();
-				status = "Returned";
-			}
-			else {
-				status = new String();
-				status = "Processed";
-			}
-			shownOption = new String();
-			shownOption = "Return";
-		}
-		else {
-			status = new String();
-			shownOption = new String();
-			status = "Pending";
-			shownOption = "Set Processed";
+		int n = JOptionPane.showOptionDialog(null, orderDetailsMessage, "ORDER ID: "
+				+ (order.getId()) + "    STAFF ID: " + order.getCurrentlyLoggedInStaff().getId()
+				+ " STATUS : " + status /* order.isStatus() */, JOptionPane.YES_NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+		if (n == 1) {
+			order.setStatus(true);
 		}
 	}
 

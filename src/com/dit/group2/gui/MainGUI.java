@@ -52,6 +52,7 @@ public class MainGUI extends JFrame implements ActionListener {
 	private JMenuItem saveMenuItem;
 	private JMenuItem aboutMenuItem;
 	private JMenuItem howToMenuItem;
+	private AccountingTab accountingTab;
 
 	private JFileChooser fileChooser;
 	private File file;
@@ -145,6 +146,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		customerOrderHistorytab = new CustomerOrderHistoryTab(driver);
 		supplyOrderHistorytab = new SupplyOrderHistoryTab(driver);
 		supplyOrderTab = new SupplyOrderTab(currentlyLoggedInStaff, driver);
+		accountingTab = new AccountingTab(driver);
 
 		// Add the tabs to the pane
 		tabbedPane.addTab("Customer", new ImageIcon("Images/CustomerIcon.jpg"), customerTab,

@@ -25,6 +25,7 @@ public class Order {
 	long rangeend = Timestamp.valueOf("2014-09-03 00:58:00").getTime();
 	long diff = rangeend - rangebegin + 1;
 	Timestamp rand;
+	private double totalexpenditure;
 
 	public static int getUniqueId() {
 		return uniqueId;
@@ -92,5 +93,13 @@ public class Order {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public double getTotalExpenditure() {
+		return totalexpenditure;
+	}
+
+	public void setTotalExpenditure(double totalexpenditure) {
+		this.totalexpenditure = totalexpenditure;
 	}
 }

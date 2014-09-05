@@ -26,7 +26,7 @@ public class RetailSystemDriver {
 
 	// The shortest Irish phone number code is 8 digits, yet this is not accepted.
 	// (eg 096 12345)Should have unlimited upper bound. Dublin numbers not accepted!!!
-	private static String contactNumPattern = "^[0].[0-9]{8,10}$";
+	private static String contactNumPattern = "^[0].[0-9]{6,10}$";
 	private static String accessLevelPattern = "^[1-2]$";
 	private static String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
 	public static final Pattern VALID_CONTACT_NUMBER = Pattern.compile(contactNumPattern,
