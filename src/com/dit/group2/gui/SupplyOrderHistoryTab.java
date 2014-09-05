@@ -116,7 +116,7 @@ public class SupplyOrderHistoryTab extends GuiLayout implements ListSelectionLis
         "Set Processed"};
 		int n = JOptionPane.showOptionDialog(null,
 		orderDetailsMessage,
-		 "ORDER ID: "+ (order.getId())+"    STAFF ID: "+order.getCurrentlyLoggedInStaff().getId()+" STATUS : "+order.isStatus(),
+		 "ORDER ID: "+ (order.getId())+"    STAFF ID: "+order.getCurrentlyLoggedInStaff().getId()+" STATUS : "+order.getStatus(),
 		JOptionPane.YES_NO_OPTION,
 		JOptionPane.PLAIN_MESSAGE,
 		null,

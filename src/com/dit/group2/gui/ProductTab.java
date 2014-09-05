@@ -706,6 +706,15 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			if (!(driver.getStockDB().getStockList().size() > 0))
 				clearTextFields(driver.getStockDB().getStockList());
 			submitButtonMode = 1;
+
+			// Reset the colour of the labels
+			nameLabel.setForeground(Color.black);
+			categoryLabel.setForeground(Color.black);
+			descriptionLabel.setForeground(Color.black);
+			supplierPriceLabel.setForeground(Color.black);
+			profitMarginLabel.setForeground(Color.black);
+			supplierLabel.setForeground(Color.black);
+
 		}
 		// Cancel clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
@@ -721,6 +730,14 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			setFieldEditable(false);
 			if (!(driver.getStockDB().getStockList().size() > 0))
 				clearTextFields(driver.getStockDB().getStockList());
+
+			// Reset the colour of the labels
+			nameLabel.setForeground(Color.black);
+			categoryLabel.setForeground(Color.black);
+			descriptionLabel.setForeground(Color.black);
+			supplierPriceLabel.setForeground(Color.black);
+			profitMarginLabel.setForeground(Color.black);
+			supplierLabel.setForeground(Color.black);
 		}
 		// Cancel clicked in edit mode
 		if (e.getSource() == deleteProductButton) {
@@ -733,7 +750,6 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 			// supplier.getId()+" \t - \t "+supplier.getName());
 			submitButtonMode = 3;
 			newProductButton.doClick();
-
 		}
 
 		revalidate();

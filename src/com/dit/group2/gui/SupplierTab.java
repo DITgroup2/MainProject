@@ -315,6 +315,9 @@ public class SupplierTab extends PersonTab {
 					.getSupplierList());
 			if (!(driver.getPersonDB().getSupplierList().size() > 0))
 				clearTextFields(driver.getPersonDB().getSupplierList());
+
+			contactNameLabel.setForeground(Color.black);
+			vatNumberLabel.setForeground(Color.black);
 		}
 		// Cancel clicked within edit mode
 		if (e.getSource() == cancelEditButton) {
@@ -324,6 +327,9 @@ public class SupplierTab extends PersonTab {
 			productsComboBox.setEnabled(true);
 			if (!(driver.getPersonDB().getSupplierList().size() > 0))
 				clearTextFields(driver.getPersonDB().getSupplierList());
+
+			contactNameLabel.setForeground(Color.black);
+			vatNumberLabel.setForeground(Color.black);
 		}
 
 		// Delete supplier clicked

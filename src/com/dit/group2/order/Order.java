@@ -86,7 +86,7 @@ public class Order {
 		this.orderItemsList = orderEntryList;
 	}
 
-	public boolean isStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 

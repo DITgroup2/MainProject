@@ -321,6 +321,10 @@ public class StaffTab extends PersonTab {
 					.getStaffList());
 			if (!(driver.getPersonDB().getStaffList().size() > 0))
 				clearTextFields(driver.getPersonDB().getStaffList());
+
+			accessLevelLabel.setForeground(Color.black);
+			passwordLabel1.setForeground(Color.black);
+			passwordLabel2.setForeground(Color.black);
 		}
 		// Cancel button clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
@@ -330,6 +334,10 @@ public class StaffTab extends PersonTab {
 			togglePasswordField();
 			if (!(driver.getPersonDB().getStaffList().size() > 0))
 				clearTextFields(driver.getPersonDB().getStaffList());
+
+			accessLevelLabel.setForeground(Color.black);
+			passwordLabel1.setForeground(Color.black);
+			passwordLabel2.setForeground(Color.black);
 		}
 
 		// Delete button clicked

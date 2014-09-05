@@ -117,9 +117,31 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	 * @param order
 	 */
 	private void showOrderDetails(Order order) {
-		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
+		String status, shownOption = "Set Processed";
+		boolean isReturned = false;
 
-		orderDetailsMessage += "\nItems in this order: ";
+		if (order.getStatus()) {
+			if (isReturned) {
+				status = new String();
+				status = "Returned";
+			}
+			else {
+				status = new String();
+				status = "Processed";
+			}
+			shownOption = new String();
+			shownOption = "Return";
+		}
+		else {
+			status = new String();
+			shownOption = new String();
+			status = "Pending";
+			shownOption = "Set Processed";
+		}
+
+		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
+		orderDetailsMessage += "\nSTATUS: " + status;
+		orderDetailsMessage += "\nITEMS: ";
 		for (StockItem stockItem : order.getOrderEntryList()) {
 			orderDetailsMessage += "\n     " + stockItem.getQuantity() + " \t x \t "
 					+ stockItem.getProduct().getProductName() + " \t\t\t    Subtotal: \t\u20ac"
@@ -134,16 +156,38 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 		orderDetailsMessage += "\n\nThe total order value is \t\u20ac"
 				+ order.getGrandTotalOfOrder() + "\n";
 
-		Object[] options = { "OK", "Set Processed" };
-		int n = JOptionPane.showOptionDialog(null, orderDetailsMessage, "ORDER ID: "
-				+ (order.getId()) + "    STAFF ID: " + order.getCurrentlyLoggedInStaff().getId()
-				+ " STATUS : " + order.isStatus(), JOptionPane.YES_NO_OPTION,
-				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-		System.out.println(n);
-		if (n == 1) {
-			order.setStatus(true);
+		Object[] options = { "OK", shownOption };
+		if (order.getStatus()) {
+			int n = JOptionPane.showOptionDialog(null, orderDetailsMessage, "ORDER ID: "
+					+ (order.getId()) + "    STAFF ID: "
+					+ order.getCurrentlyLoggedInStaff().getId()
+			/* + " STATUS : " + order.isStatus() */, JOptionPane.YES_NO_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+			if (n == 1) {
+				order.setStatus(true);
+				if (shownOption.equals("Return")) {
+					isReturned = true;
+				}
+			}
 		}
-
+		if (order.getStatus()) {
+			if (isReturned) {
+				status = new String();
+				status = "Returned";
+			}
+			else {
+				status = new String();
+				status = "Processed";
+			}
+			shownOption = new String();
+			shownOption = "Return";
+		}
+		else {
+			status = new String();
+			shownOption = new String();
+			status = "Pending";
+			shownOption = "Set Processed";
+		}
 	}
 
 	/**

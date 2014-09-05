@@ -404,6 +404,12 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 				deletePersonButton.setEnabled(true);
 				editPersonButton.setEnabled(true);
 			}
+
+			idLabel.setForeground(Color.black);
+			nameLabel.setForeground(Color.black);
+			emailLabel.setForeground(Color.black);
+			contactNumberLabel.setForeground(Color.black);
+			addressLabel.setForeground(Color.black);
 		}
 		// Cancel button clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
@@ -414,6 +420,12 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 			editPersonButton.setEnabled(true);
 			editPersonButton.setVisible(true);
 			comboBox.setEnabled(true);
+
+			idLabel.setForeground(Color.black);
+			nameLabel.setForeground(Color.black);
+			emailLabel.setForeground(Color.black);
+			contactNumberLabel.setForeground(Color.black);
+			addressLabel.setForeground(Color.black);
 		}
 		// Refresh the view
 		revalidate();
