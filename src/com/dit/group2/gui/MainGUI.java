@@ -146,7 +146,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		customerOrderHistorytab = new CustomerOrderHistoryTab(driver);
 		supplyOrderHistorytab = new SupplyOrderHistoryTab(driver);
 		supplyOrderTab = new SupplyOrderTab(currentlyLoggedInStaff, driver);
-		accountingTab = new AccountingTab(driver);
+		// accountingTab = new AccountingTab(driver);
 
 		// Add the tabs to the pane
 		tabbedPane.addTab("Customer", new ImageIcon("Images/CustomerIcon.jpg"), customerTab,
@@ -196,7 +196,6 @@ public class MainGUI extends JFrame implements ActionListener {
 			if (answer == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
-			System.out.println("Terminate Program!");
 		}
 
 		// Logout option

@@ -210,11 +210,9 @@ public class StaffTab extends PersonTab {
 				}
 				// Edit mode selected
 				if (editMode) {
-					System.out.println(valid);
 					if (valid) {
 						driver.getPersonDB().changePersonDetails(person, name, email,
 								contactNumber, address, aLevel, password, null, null);
-						System.out.println("Done");
 						setTextField(getIndex(driver.getPersonDB().getStaffList()), driver
 								.getPersonDB().getStaffList());
 					}

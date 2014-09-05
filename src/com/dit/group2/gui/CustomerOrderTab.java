@@ -666,8 +666,6 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 						new Order(driver.getPersonDB().getRandomStaff(), orderStockItemList.get(
 								orderStockItemList.size() - 1).getProduct().getSupplier(),
 								orderStockItemList, grandTotal));
-			else
-				System.out.println("Empty List!!");
 		}
 		grandTotal = 0;
 	}

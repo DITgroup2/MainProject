@@ -632,12 +632,10 @@ public class ProductTab extends GuiLayout implements ActionListener, ItemListene
 
 			}
 			else {
-				System.out.println(" here4 " + supplier);
 				supplier = null;
 				supplierComboBox.setSelectedItem(supplier);
 				supplierComboBox.setEnabled(true);
 				submitButtonMode = 1;
-				System.out.println(" here5 " + supplier);
 			}
 			if (driver.getPersonDB().getSupplierList().size() <= 0)
 				JOptionPane
