@@ -1,14 +1,15 @@
 package com.dit.group2.gui;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.DefaultComboBoxModel;
@@ -38,8 +39,6 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 
 	private RetailSystemDriver driver;
 	private ArrayList<StockItem> orderStockItemList;
-	private ArrayList<ArrayList<Product>> productList;
-	private Random random;
 	private Staff currentlyLoggedInStaff;
 	private NumberFormat formatter = new DecimalFormat("#0.00");
 
@@ -67,7 +66,7 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	protected JLabel productComboBoxLabel, quantityLabel, availableQuantityLabel,
 			availableQuantityField, priceLabel, priceField, grandTotalLabel, grandTotalField,
 			orderListProductLabel, orderListQtyLabel, orderListPriceLabel,
-			orderListTotalPriceLabel, customerComboBoxLabel, customerIDLabel, customerIDField;
+			orderListTotalPriceLabel, customerComboBoxLabel;
 	protected JTextField quantityTextField;
 	protected JButton addButton, removeButton, processButton, cancelButton;
 	protected double grandTotal = 0;
@@ -86,7 +85,6 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		titleLabel.setText("Customer Order Form");
 		setUpCustomerComboBox();
 		setUpProductComboBox();
-		setUpCustomerNameField();
 		setUpQuantityTextField();
 		setUpAvailableQuantity();
 		setUpPriceFields();
@@ -113,48 +111,38 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 
 		// Other tool tips...
 
-		random = new Random();
-		automaticallyCreateOrders();
+		// automaticallyCreateOrders();
 	}
 
 	/** add customer combo box */
 	private void setUpCustomerComboBox() {
 		customerComboBoxLabel = new JLabel("Customers");
-		customerComboBoxLabel.setBounds(59, 33, 93, 20);
+		customerComboBoxLabel.setBounds(59, 7, 93, 20);
 		mainPanel.add(customerComboBoxLabel);
-		customerComboBox.setBounds(200, 30, 265, 23);
+		customerComboBox.setBounds(200, 7, 265, 23);
 		mainPanel.add(customerComboBox);
 		fillUpCustomerComboBox();
 		customerComboBox.addItemListener(this);
+		customerComboBox.addMouseListener(this);
 	}
 
 	/** add product combo box */
 	private void setUpProductComboBox() {
 		productComboBoxLabel = new JLabel("Products");
-		productComboBoxLabel.setBounds(59, 55, 265, 20);
-		productComboBox.setBounds(200, 55, 265, 23);
+		productComboBoxLabel.setBounds(59, 32, 265, 20);
+		productComboBox.setBounds(200, 32, 265, 23);
 		mainPanel.add(productComboBoxLabel);
 		mainPanel.add(productComboBox);
 		fillUpProductComboBox();
 		productComboBox.addItemListener(this);
 	}
 
-	/** add customer name field */
-	private void setUpCustomerNameField() {
-		customerIDLabel = new JLabel("Customer ID");
-		customerIDLabel.setBounds(59, 10, 93, 20);
-		customerIDField = new JLabel();
-		customerIDField.setBounds(203, 7, 265, 23);
-		mainPanel.add(customerIDLabel);
-		mainPanel.add(customerIDField);
-	}
-
 	/** add product quantity field */
 	private void setUpQuantityTextField() {
 		quantityLabel = new JLabel("Order Quantity");
-		quantityLabel.setBounds(59, 130, 110, 20);
+		quantityLabel.setBounds(59, 107, 110, 20);
 		quantityTextField = new JTextField("1");
-		quantityTextField.setBounds(200, 133, 50, 23);
+		quantityTextField.setBounds(200, 109, 50, 23);
 		mainPanel.add(quantityLabel);
 		mainPanel.add(quantityTextField);
 	}
@@ -162,9 +150,9 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	/** add product available quantity */
 	private void setUpAvailableQuantity() {
 		availableQuantityLabel = new JLabel("Available");
-		availableQuantityLabel.setBounds(59, 83, 93, 14);
+		availableQuantityLabel.setBounds(59, 60, 93, 14);
 		availableQuantityField = new JLabel(Integer.toString(itemsQuantity.get(0)));
-		availableQuantityField.setBounds(200, 83, 93, 14);
+		availableQuantityField.setBounds(200, 60, 93, 14);
 		mainPanel.add(availableQuantityLabel);
 		mainPanel.add(availableQuantityField);
 	}
@@ -172,9 +160,9 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	/** add product price fields */
 	private void setUpPriceFields() {
 		priceLabel = new JLabel("Unit Price");
-		priceLabel.setBounds(59, 108, 93, 14);
+		priceLabel.setBounds(59, 85, 93, 14);
 		priceField = new JLabel(formatter.format(itemsPrice.get(0)));
-		priceField.setBounds(200, 108, 93, 14);
+		priceField.setBounds(200, 85, 93, 14);
 		mainPanel.add(priceLabel);
 		mainPanel.add(priceField);
 	}
@@ -195,7 +183,7 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	private void setAddButton() {
 		addButton = new JButton("+");
 		addButton.setFont(new Font("Arial", Font.BOLD, 22));
-		addButton.setBounds(270, 133, 93, 20);
+		addButton.setBounds(270, 110, 93, 20);
 		addButton.addActionListener(this);
 		mainPanel.add(addButton);
 	}
@@ -205,7 +193,7 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		removeButton = new JButton("-");
 		removeButton.setFont(new Font("Arial", Font.BOLD, 35));
 
-		removeButton.setBounds(380, 133, 93, 20);
+		removeButton.setBounds(380, 110, 93, 20);
 		removeButton.addActionListener(this);
 		mainPanel.add(removeButton);
 		removeButton.setEnabled(false);
@@ -232,20 +220,20 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	/** add buying list */
 	private void orderingList() {
 		orderListProductLabel = new JLabel("Product name");
-		orderListProductLabel.setBounds(59, 155, 110, 20);
+		orderListProductLabel.setBounds(59, 140, 110, 20);
 		orderListQtyLabel = new JLabel("Qty");
-		orderListQtyLabel.setBounds(275, 155, 30, 20);
+		orderListQtyLabel.setBounds(275, 140, 30, 20);
 		orderListPriceLabel = new JLabel("Price");
-		orderListPriceLabel.setBounds(340, 155, 50, 20);
+		orderListPriceLabel.setBounds(340, 140, 50, 20);
 		orderListTotalPriceLabel = new JLabel("Total");
-		orderListTotalPriceLabel.setBounds(420, 155, 50, 20);
+		orderListTotalPriceLabel.setBounds(420, 140, 50, 20);
 		mainPanel.add(orderListProductLabel);
 		mainPanel.add(orderListQtyLabel);
 		mainPanel.add(orderListPriceLabel);
 		mainPanel.add(orderListTotalPriceLabel);
 
 		orderingList.addListSelectionListener(this);
-		orderingListSroll.setBounds(59, 180, 420, 135);
+		orderingListSroll.setBounds(59, 157, 420, 157);
 
 		mainPanel.add(orderingListSroll);
 
@@ -262,16 +250,18 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		ArrayList<Person> customers = driver.getPersonDB().getCustomerList();
 		customerComboBoxItems.clear();
 		customerComboBoxItems.add("<html><font color='red'>Add New Customer</font></html>");
+		String item = "";
 		for (Person customer : customers) {
-			customerComboBoxItems.add(customer.getName());
+			item = "\t" + customer.getId() + " \t - \t " + customer.getName();
+			customerComboBoxItems.add(item);
 		}
-		customerComboBox.setSelectedIndex(customers.size() - 1);
+		customerComboBox.setSelectedIndex(customers.size());
 		validate();
 		repaint();
 	}
 
 	/** fill up product combo Box with price and quantity */
-	private void fillUpProductComboBox() {
+	public void fillUpProductComboBox() {
 		ArrayList<StockItem> list = driver.getStockDB().getStockList();
 		comboBoxItems.clear();
 		itemsQuantity.clear();
@@ -291,10 +281,6 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		availableQuantityField.setText(Integer.toString(itemsQuantity.get(index)));
 		grandTotalField.setText(formatter.format(grandTotal));
 		productComboBox.setSelectedIndex(index);
-		if (customerComboBox.getSelectedIndex() != 0) {
-			customerIDField.setText(Integer.toString(driver.getPersonDB().getCustomerList().get(
-					(customerComboBox.getSelectedIndex() - 1)).getId()));
-		}
 	}
 
 	private String textAlignment(String text1, String text2, String text3, String text4) {
@@ -321,7 +307,6 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 			 * .getItemAt(supplierComboBox.getSelectedIndex()));
 			 */
 		}
-
 	}
 
 	/** button actions */
@@ -480,44 +465,53 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 				orderStockItem.setQuantity(currentOrderListQuantity.get(i));
 				orderStockItemList.add(orderStockItem);
 			}
-			Customer customer = (Customer) driver.getPersonDB().getCustomerList().get(
-					customerComboBox.getSelectedIndex() - 1);
+			if (driver.getPersonDB().getCustomerList().size() > 0) {
+				Customer customer = (Customer) driver.getPersonDB().getCustomerList().get(
+						customerComboBox.getSelectedIndex() - 1);
 
-			// Staff responsibleStaffForOrder = (Staff)driver.getPersonDB().getStaffList().get(0);
+				// Staff responsibleStaffForOrder =
+				// (Staff)driver.getPersonDB().getStaffList().get(0);
 
-			// make a new order and put it to the orderDB
-			Order order = new Order(currentlyLoggedInStaff, customer, orderStockItemList,
-					grandTotal, new java.util.Date());
-			driver.getOrderDB().getCustomerOrderList().add(order);
-			customer.getOrders().add(order);
+				// make a new order and put it to the orderDB
+				Order order = new Order(currentlyLoggedInStaff, customer, orderStockItemList,
+						grandTotal, new java.util.Date());
+				driver.getOrderDB().getCustomerOrderList().add(order);
+				customer.getOrders().add(order);
 
-			// reduce the products' quantity in stockDBControl
-			int quantity;
-			for (int index = 0; index < currentOrderList.size(); index++) {
-				quantity = driver.getStockDB().getStockItem(
-						currentOrderList.get(index).getProductID()).getQuantity();
-				quantity -= currentOrderListQuantity.get(index);
-				driver.getStockDB().getStockItem(currentOrderList.get(index).getProductID())
-						.setQuantity(quantity);
+				// reduce the products' quantity in stockDBControl
+				int quantity;
+				for (int index = 0; index < currentOrderList.size(); index++) {
+					quantity = driver.getStockDB().getStockItem(
+							currentOrderList.get(index).getProductID()).getQuantity();
+					quantity -= currentOrderListQuantity.get(index);
+					driver.getStockDB().getStockItem(currentOrderList.get(index).getProductID())
+							.setQuantity(quantity);
+				}
+
+				driver.getGui().getCustomerTab().setAutomaticItemSelection(true);
+				driver.getGui().getCustomerTab().addItemsToOrderCombobox();
+				driver.getGui().getCustomerOrderHistorytab().setOrderList();
+				showOrderDetails(order);
+
+				// clear the tab and refresh
+				listModel.clear();
+				currentOrderList.clear();
+				currentOrderListQuantity.clear();
+				grandTotal = 0;
+				removeButton.setEnabled(false);
+				cancelButton.setEnabled(false);
+				processButton.setEnabled(false);
+				fillUpCustomerComboBox();
+				fillUpProductComboBox();
+				refreshTab(0);
+				driver.getGui().getStockControlTab().refreshStockControlTab();
+				driver.getGui().getAccountingTab().refreshAccountingTab();
 			}
-
-			driver.getGui().getCustomerTab().setAutomaticItemSelection(true);
-			driver.getGui().getCustomerTab().addItemsToOrderCombobox();
-			driver.getGui().getCustomerOrderHistorytab().setOrderList();
-			showOrderDetails(order);
-
-			// clear the tab and refresh
-			listModel.clear();
-			currentOrderList.clear();
-			currentOrderListQuantity.clear();
-			grandTotal = 0;
-			removeButton.setEnabled(false);
-			cancelButton.setEnabled(false);
-			processButton.setEnabled(false);
-			fillUpCustomerComboBox();
-			fillUpProductComboBox();
-			refreshTab(0);
-			driver.getGui().getStockControlTab().refreshStockControlTab();
+			else {
+				customerComboBoxLabel.setForeground(Color.red);
+				JOptionPane.showMessageDialog(this,
+						"Order cannot be created!\nCustomer field cannot be empty!");
+			}
 		}
 		// CANCEL BUTTON
 		if (e.getSource() == cancelButton) {
@@ -592,8 +586,10 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (e.getSource() == orderingList) {
+
 			// check if order list is empty
 			if (orderingList.getSelectedIndex() > -1) {
+
 				// separate the text in the selected list item
 				String[] values = orderingList.getSelectedValue().split("\\t");
 				// call method to set the current combobox item according to the product name of the
@@ -605,68 +601,16 @@ public class CustomerOrderTab extends GuiLayout implements ActionListener, ItemL
 		}
 	}
 
-	private ArrayList<StockItem> getRandomOrderItemList(boolean customerOrderMode) {
-		boolean selected[] = new boolean[driver.getStockDB().getStockList().size()];
-		for (int i = 0; i < selected.length; i++)
-			selected[i] = false;
-
-		orderStockItemList = new ArrayList<StockItem>();
-		grandTotal = 0;
-
-		for (int i = 0; i < random.nextInt((10 - 1) + 1) + 3; i++) {
-			Product randomProduct = driver.getStockDB().getRandomProduct();
-			int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
-			if (!selected[randomProduct.getProductID() - 1]) {
-				selected[randomProduct.getProductID() - 1] = true;
-				orderStockItemList.add(new StockItem(randomProduct, randomQuantity));
-				if (customerOrderMode) {
-					grandTotal += (randomQuantity * randomProduct.getRetailPrice());
-				}
-				else
-					grandTotal += (randomQuantity * (randomProduct.getSupplierPrice()));
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (e.getSource() == customerComboBox) {
+			if (customerComboBox.getSelectedItem().equals(
+					"<html><font color='red'>Add New Customer</font></html>")) {
+				driver.getGui().getTabbedPane().setSelectedComponent(
+						driver.getGui().getCustomerTab());
+				driver.getGui().getCustomerTab().getNewCustomerButton().doClick();
 			}
-		}
-		return orderStockItemList;
-	}
-
-	private void createSupplyProductList() {
-		productList = new ArrayList<ArrayList<Product>>();
-		ArrayList<Product> list;
-		for (Person supplier : driver.getPersonDB().getSupplierList()) {
-			list = new ArrayList<Product>();
-			for (StockItem stockItem : driver.getStockDB().getStockList()) {
-				Product product = stockItem.getProduct();
-				if (product.getSupplier().equals(supplier)) {
-					list.add(product);
-				}
-			}
-			productList.add(list);
 		}
 	}
 
-	private void automaticallyCreateOrders() {
-
-		// for (int i = 0; i < random.nextInt((10 - 5) + 1) + 5; i++) {
-		for (int i = 0; i < 100; i++) {
-			driver.getOrderDB().getCustomerOrderList().add(
-					new Order(driver.getPersonDB().getRandomStaff(), (Customer) driver
-							.getPersonDB().getRandomCustomer(), getRandomOrderItemList(true),
-							grandTotal));
-		}
-		createSupplyProductList();
-		orderStockItemList = new ArrayList<StockItem>();
-		for (ArrayList<Product> list : productList) {
-			orderStockItemList = new ArrayList<StockItem>();
-			for (Product product : list) {
-				int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
-				orderStockItemList.add(new StockItem(product, randomQuantity));
-			}
-			if (orderStockItemList.size() > 0)
-				driver.getOrderDB().getSupplyOrderList().add(
-						new Order(driver.getPersonDB().getRandomStaff(), orderStockItemList.get(
-								orderStockItemList.size() - 1).getProduct().getSupplier(),
-								orderStockItemList, grandTotal));
-		}
-		grandTotal = 0;
-	}
 }

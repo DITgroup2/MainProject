@@ -1,6 +1,7 @@
 package com.dit.group2.order;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -21,14 +22,25 @@ public class Order {
 	private double grandTotal;
 	private Date date;
 	private boolean status;
-	long rangebegin = Timestamp.valueOf("2014-08-08 00:00:00").getTime();
-	long rangeend = Timestamp.valueOf("2014-09-03 00:58:00").getTime();
-	long diff = rangeend - rangebegin + 1;
+	static long rangebegin = Timestamp.valueOf("2012-08-01 00:00:00").getTime();
+	static long rangeend = rangebegin +(1000*9*60*60);//Timestamp.valueOf("2014-09-03 00:58:00").getTime();
+	long diff = 0;
 	Timestamp rand;
-	private double totalexpenditure;
 
 	public static int getUniqueId() {
 		return uniqueId;
+	}
+	
+	public Timestamp getRandomTimeStamp(){
+		
+		diff = rangeend - rangebegin + 1;
+		do{
+			rand = new Timestamp(rangebegin + (long) (Math.random() * diff));
+		}while(rand.getTime()<rangebegin);
+		rangebegin = rand.getTime();
+		rangeend +=+(1000*3*60*60); 
+		return rand;
+		
 	}
 
 	public Order(Staff currentlyLoggedInStaff, Person person, ArrayList<StockItem> orderItemsList,
@@ -39,8 +51,8 @@ public class Order {
 		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
 		this.orderItemsList = orderItemsList;
 		this.status = true;
-		rand = new Timestamp(rangebegin + (long) (Math.random() * diff));
-		date = rand;
+		
+		date = getRandomTimeStamp();
 	}
 
 	public Order(Staff currentlyLoggedInStaff, Person person, ArrayList<StockItem> orderItemsList,
@@ -51,12 +63,16 @@ public class Order {
 		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
 		this.orderItemsList = orderItemsList;
 		this.status = false;
-		rand = new Timestamp(date.getTime());
-		this.date = rand;
+		this.date = new Timestamp(date.getTime());
+		
 	}
-
+	
 	public Date getDate() {
 		return date;
+	}
+	
+	public String getDateString() {
+		return new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(date);
 	}
 
 	public Staff getCurrentlyLoggedInStaff() {
@@ -87,19 +103,11 @@ public class Order {
 		this.orderItemsList = orderEntryList;
 	}
 
-	public boolean getStatus() {
+	public boolean isStatus() {
 		return status;
 	}
 
 	public void setStatus(boolean status) {
 		this.status = status;
-	}
-
-	public double getTotalExpenditure() {
-		return totalexpenditure;
-	}
-
-	public void setTotalExpenditure(double totalexpenditure) {
-		this.totalexpenditure = totalexpenditure;
 	}
 }

@@ -17,52 +17,47 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.ui.RectangleInsets;
 
-import com.dit.group2.order.OrderDB;
 import com.dit.group2.order.Prediction01;
-import com.dit.group2.stock.StockDB;
+import com.dit.group2.retailSystem.RetailSystemDriver;
 
 public class PredictionChart {
 
-	private StockDB stockDBControls;
-	private OrderDB orderDB;
+	private RetailSystemDriver driver;
 
-	public void buildPredictionChart(StockDB stockDBControl, OrderDB orderDB) {
+	public void buildPredictionChart(RetailSystemDriver driver) {
+
+		this.driver = driver;
 		Calendar rightNow = Calendar.getInstance();
 
 		/* creating timeSeriesCollection */
 		// Calendar c = Calendar.getInstance();
 		int month = rightNow.get(Calendar.MONTH);
-		System.out.println(rightNow.get(Calendar.MONTH));
-		System.out.println(rightNow.get(Calendar.DAY_OF_YEAR));
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
-		TimeSeries timeSeries1 = new TimeSeries("Sample 1");
-		TimeSeries timeSeries2 = new TimeSeries("Sample 2");
+		TimeSeries timeSeries1 = new TimeSeries("Past 30 days Sales");
+		TimeSeries timeSeries2 = new TimeSeries("Predicted Sales");
 
-		Prediction01 pred = new Prediction01(stockDBControl.getStockList().get(
-				orderDB.getChartCustomerIndex()).getProduct(), orderDB.getCustomerOrderList());
+		Prediction01 pred = new Prediction01(driver.getStockDB().getStockList().get(
+				driver.getGui().getAccountingTab().getProductCombobox().getSelectedIndex())
+				.getProduct(), driver.getOrderDB().getCustomerOrderList());
 
 		// Color myColor = Color.getColor("myColor");
 		Color color = Color.blue;
 
 		for (int i = 0; i < 40; i++) {
-
-			// System.out.println("prediciton douubles: " + pred.getPredictionInts()[i]);
-			// Prediction01 pred = new
-			// Prediction01(stockDBControl.getStockList().get(0).getProduct(),orderDB.getCustomerOrderList());
-			System.out.println("dayyy of month...."
-					+ Calendar.DAY_OF_MONTH
-					+ " "
-					+ stockDBControl.getStockList().get(orderDB.getChartCustomerIndex())
-							.getProduct().getProductName());
-
 			if ((Calendar.DAY_OF_MONTH + i) < 31) {
 				timeSeries1.add(new Day(Calendar.DAY_OF_MONTH + i, month, 2014), pred
 						.getPredictionInts()[i]);
 			}
-			if ((Calendar.DAY_OF_MONTH + i) > 30) {
+			if (((Calendar.DAY_OF_MONTH + i) > 30) && ((Calendar.DAY_OF_MONTH + i) < 38)) {
 				color = Color.green;
+				timeSeries1.add(new Day(((Calendar.DAY_OF_MONTH + i) - 30), month + 1, 2014), pred
+						.getPredictionInts()[i]);
+			}
+			if ((Calendar.DAY_OF_MONTH + i) > 38) {
+
 				timeSeries2.add(new Day(((Calendar.DAY_OF_MONTH + i) - 30), month + 1, 2014), pred
 						.getPredictionInts()[i]);
+
 			}
 
 		}
@@ -70,9 +65,11 @@ public class PredictionChart {
 		dataset.addSeries(timeSeries2);
 
 		/* Creating the chart */
-		JFreeChart chart = ChartFactory.createTimeSeriesChart(stockDBControl.getStockList().get(
-				orderDB.getChartCustomerIndex()).getProduct().getProductName(), "Date",
-				"Quantity Sold", dataset, true, true, false);
+		JFreeChart chart = ChartFactory
+				.createTimeSeriesChart(driver.getStockDB().getStockList().get(
+						driver.getGui().getAccountingTab().getProductCombobox().getSelectedIndex())
+						.getProduct().getProductName(), "Date", "Quantity Sold", dataset, true,
+						true, false);
 		/* Altering the graph */
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.setAxisOffset(new RectangleInsets(5.0, 10.0, 10.0, 5.0));
@@ -86,7 +83,7 @@ public class PredictionChart {
 		renderer.setBaseShapesVisible(true);
 		renderer.setBaseShapesFilled(true);
 		NumberAxis numberAxis = (NumberAxis) plot.getRangeAxis();
-		numberAxis.setRange(new Range(0, 25));
+		numberAxis.setRange(new Range(0, 50));
 		DateAxis axis = (DateAxis) plot.getDomainAxis();
 		axis.setDateFormatOverride(new SimpleDateFormat("dd-MM-yyyy"));
 		axis.setAutoTickUnitSelection(false);

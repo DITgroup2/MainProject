@@ -120,7 +120,7 @@ public class Login extends JFrame implements ActionListener {
 				char[] validate = passwordField.getPassword();
 				login = ((Staff) user).passwordValidation(validate);
 				if (login) {
-					gui = new MainGUI((Staff) user, driver);
+					gui = new MainGUI(user, driver);
 					driver.setGui(gui);
 					if (((Staff) user).getAccessLevel() == 2) {
 						gui.getSupplierTab().enableButtons(true);

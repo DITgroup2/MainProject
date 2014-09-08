@@ -6,10 +6,13 @@ import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.w3c.dom.ls.LSInput;
 
 import com.dit.group2.order.Order;
 import com.dit.group2.person.Customer;
@@ -22,15 +25,13 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	private RetailSystemDriver driver;
 	private JScrollPane scrollPane;
 
-	private JLabel idLabel;
-	private JLabel customerLabel;
-	private JLabel dateLabel;
-	private JLabel staffLabel;
+	private JLabel idLabel, customerLabel, dateLabel, staffLabel, tickLabel;
 	private JTextArea textArea;
 
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
 	private JList<String> orderList = new JList<String>(listModel);
 	private JScrollPane listSroll = new JScrollPane(orderList);
+	private JScrollBar scrollBar;
 
 	private TabListCellRenderer renderer = new TabListCellRenderer(true);
 
@@ -45,30 +46,34 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 		titleLabel.setText("Customer Order History");
 		textArea = new JTextArea();
 		scrollPane = new JScrollPane(textArea);
-		idLabel = new JLabel("Order ID");
+		idLabel = new JLabel("ID");
 		dateLabel = new JLabel("Date");
-		customerLabel = new JLabel("Customer ID");
-		staffLabel = new JLabel("Staff ID");
+		customerLabel = new JLabel("Customer");
+		staffLabel = new JLabel("Staff");
+		tickLabel = new JLabel("Dispatched");
 
-		idLabel.setBounds(18, 7, 150, 23);
-		dateLabel.setBounds(160, 7, 100, 23);
-		customerLabel.setBounds(285, 7, 150, 23);
-		staffLabel.setBounds(435, 7, 150, 23);
+		idLabel.setBounds(12, 7, 150, 23);
+		dateLabel.setBounds(100, 7, 100, 23);
+		customerLabel.setBounds(223, 7, 150, 23);
+		staffLabel.setBounds(344, 7, 150, 23);
+		tickLabel.setBounds(410, 7, 150, 23);
 
-		idLabel.setFont(new Font("Arial", Font.BOLD, 20));
-		customerLabel.setFont(new Font("Arial", Font.BOLD, 20));
-		staffLabel.setFont(new Font("Arial", Font.BOLD, 20));
-		dateLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		idLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		customerLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		staffLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		dateLabel.setFont(new Font("Arial", Font.BOLD, 18));
+		tickLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
 		orderList.addListSelectionListener(this);
 		listSroll.setBounds(10, 30, 510, 310);
+		mainPanel.add(tickLabel);
 		mainPanel.add(idLabel);
 		mainPanel.add(listSroll);
 		mainPanel.add(customerLabel);
 		mainPanel.add(dateLabel);
 		mainPanel.add(staffLabel);
 		add(titleLabel);
-		renderer.setTabs(new int[] { 105, 325, 455 });
+		renderer.setTabs(new int[] { 55, 230, 337, 435 });
 		orderList.setCellRenderer(renderer);
 
 		setLayout(null);
@@ -83,17 +88,20 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	 * Set the order list
 	 */
 	public void setOrderList() {
-
-		int index = 0;
 		listModel.clear();
 		for (Order order : driver.getOrderDB().getCustomerOrderList()) {
-			listModel
-					.addElement(textAlignment("         " + order.getId(), "" + order.getDate(), ""
-							+ order.getPerson().getId(), ""
-							+ order.getCurrentlyLoggedInStaff().getId()));
-			// stockList.setSelectedIndex(orderListIndex);
-			index++;
+			if(order.isStatus())
+				listModel.addElement(textAlignment(" " + order.getId(), "" + order.getDateString(), ""
+								+order.getPerson().getName(), ""
+								+order.getCurrentlyLoggedInStaff().getName(), "\u2713"));
+			else
+				listModel.addElement(textAlignment(" " + order.getId(), "" + order.getDateString(), ""
+						+ order.getPerson().getId(), ""
+						+ order.getCurrentlyLoggedInStaff().getId(), ""));
+			
 		}
+		scrollBar = listSroll.getVerticalScrollBar();
+		scrollBar.setValue(listSroll.getVerticalScrollBar().getMaximum());
 	}
 
 	/**
@@ -105,9 +113,9 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	 * @param text4
 	 * @return
 	 */
-	private String textAlignment(String text1, String text2, String text3, String text4) {
+	private String textAlignment(String text1, String text2, String text3, String text4, String text5) {
 		String s = text1;
-		s += "\t" + text2 + "\t" + text3 + "\t" + text4;
+		s += "\t" + text2 + "\t" + text3 + "\t" + text4+ "\t" + text5;
 		return s;
 	}
 
@@ -117,48 +125,36 @@ public class CustomerOrderHistoryTab extends GuiLayout implements ListSelectionL
 	 * @param order
 	 */
 	private void showOrderDetails(Order order) {
-		String status, shownOption;
-
-		if (order.getStatus()) {
-			status = new String();
-			status = "Processed";
-
-			shownOption = new String();
-			shownOption = "Return";
-		}
-		else {
-			status = new String();
-			shownOption = new String();
-
+		String status = "";
+		if(order.isStatus())
+			status = "Dispatched";
+		else
 			status = "Pending";
-			shownOption = "Set Processed";
-		}
-
-		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
-		orderDetailsMessage += "\nSTATUS: " + status;
-		orderDetailsMessage += "\nITEMS: ";
+		String orderDetailsMessage = "ORDER DATE : " + order.getDateString()+ "\nORDER STATUS : " + status;
+		orderDetailsMessage += "\nItems in this order: ";
 		for (StockItem stockItem : order.getOrderEntryList()) {
 			orderDetailsMessage += "\n     " + stockItem.getQuantity() + " \t x \t "
 					+ stockItem.getProduct().getProductName() + " \t\t\t    Subtotal: \t\u20ac"
 					+ (stockItem.getProduct().getRetailPrice() * stockItem.getQuantity());
 		}
 
-		orderDetailsMessage += "\n\nCUSTOMER ID: " + order.getPerson().getId()
-				+ "\nPersonal Details: ";
+		orderDetailsMessage += "\n\nCUSTOMER ID: " + order.getPerson().getId()+ "\nPersonal Details: ";
 		orderDetailsMessage += "\n     Name: \t" + order.getPerson().getName();
 		orderDetailsMessage += "\n     Phone: \t" + order.getPerson().getContactNumber();
 		orderDetailsMessage += "\n     Address: \t" + order.getPerson().getAddress();
 		orderDetailsMessage += "\n\nThe total order value is \t\u20ac"
 				+ order.getGrandTotalOfOrder() + "\n";
 
-		Object[] options = { "OK", shownOption };
+		Object[] options = { "OK", "Dispatch" };
 		int n = JOptionPane.showOptionDialog(null, orderDetailsMessage, "ORDER ID: "
 				+ (order.getId()) + "    STAFF ID: " + order.getCurrentlyLoggedInStaff().getId()
-				+ " STATUS : " + status /* order.isStatus() */, JOptionPane.YES_NO_OPTION,
+				, JOptionPane.YES_NO_OPTION,
 				JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
 		if (n == 1) {
 			order.setStatus(true);
+			setOrderList();
 		}
+
 	}
 
 	/**

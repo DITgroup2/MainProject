@@ -1,45 +1,50 @@
 package com.dit.group2.gui;
 
+import java.awt.Color;
+import java.awt.ComponentOrientation;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Vector;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JInternalFrame;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import com.dit.group2.graphs.BarChartDemo1;
+import com.dit.group2.graphs.AllProductsChart;
+import com.dit.group2.graphs.BarChartSales;
 import com.dit.group2.graphs.ChartDataHolder;
 import com.dit.group2.graphs.PredictionChart;
 import com.dit.group2.order.Account;
 import com.dit.group2.order.Order;
-import com.dit.group2.order.OrderDB;
-import com.dit.group2.order.Prediction01;
 import com.dit.group2.retailSystem.RetailSystemDriver;
-import com.dit.group2.stock.StockDB;
 import com.dit.group2.stock.StockItem;
 
-public class AccountingTab extends JPanel implements ActionListener, ItemListener,
+public class AccountingTab extends GuiLayout implements ActionListener, ItemListener,
 		ListSelectionListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	protected boolean emptiedList;
 	private RetailSystemDriver driver;
+	protected boolean emptiedList;
+
 	Account account = new Account();
 
-	private StockDB stockDBControl;
+	private int expenses = 10000;
+	private int rent = 10000;
+	private int wages = 100000;
 
 	private TabListCellRenderer renderer = new TabListCellRenderer(true);
 	protected ArrayList<Double> itemsPrice = new ArrayList<Double>();
@@ -48,24 +53,23 @@ public class AccountingTab extends JPanel implements ActionListener, ItemListene
 	protected JList<String> stockList = new JList<String>(listModel);
 	protected JScrollPane stockListSroll = new JScrollPane(stockList);
 
-	private JButton viewBarChartButton;
-	private JButton predictionChart;
+	private JButton viewBarChartButton, predictionChart, allCharts;
+
+	protected Vector<String> comboBoxItems = new Vector<String>();
+	protected ArrayList<Integer> itemsQuantity = new ArrayList<Integer>();
+	protected DefaultComboBoxModel<String> comboBoxModel = new DefaultComboBoxModel<String>(
+			comboBoxItems);
+	protected JComboBox<String> productComboBox = new JComboBox<String>(comboBoxModel);
 
 	protected JTextArea productField;
 	protected JTextArea idField;
+	protected JTextArea expensesField;
 	protected JTextArea incomeField;
-	protected JTextArea expenditureField;
 
-	protected JLabel accountingIncomeOrderProductLabel;
-	protected JLabel productValueLabel;
-	protected JLabel quantityLabel;
+	protected JLabel productValueLabel, expensesQuantityLabel, productComboBoxLabel,
+			accountingIncomeOrderProductLabel, incomeQuantityLabel, chartsHeaderLabel;
 
-	protected JButton pieChartButton;
-	JInternalFrame frame = new JInternalFrame("Pie Chartum!", false, true, false);
-	JInternalFrame frame1 = new JInternalFrame("Bar Chart", false, true, false);
-
-	public OrderDB orderDB;
-	Double suppliertotal = 0.0;
+	int suppliertotal = 0;
 	Double total;
 	Double sales;
 	ArrayList<ChartDataHolder> arr = new ArrayList<ChartDataHolder>();
@@ -75,73 +79,70 @@ public class AccountingTab extends JPanel implements ActionListener, ItemListene
 	 */
 	public AccountingTab(RetailSystemDriver driver) {
 
-		this.stockDBControl = stockDBControl;
-		this.orderDB = orderDB;
 		this.driver = driver;
 
-		accountingIncomeOrderProductLabel = new JLabel("Product Name");
-		productValueLabel = new JLabel("Value");
-		quantityLabel = new JLabel("Quantity");
+		titleLabel.setText("Accounting");
+		productValueLabel = new JLabel("Profit & Loss Account");
+		expensesQuantityLabel = new JLabel("Expenses");
+		incomeQuantityLabel = new JLabel("Income");
+		chartsHeaderLabel = new JLabel("Charts");
 
 		idField = new JTextArea();
 		productField = new JTextArea();
+		expensesField = new JTextArea();
 		incomeField = new JTextArea();
-		expenditureField = new JTextArea();
 
-		pieChartButton = new JButton();
-		viewBarChartButton = new JButton("button!");
-		predictionChart = new JButton("button222!");
+		viewBarChartButton = new JButton("Sales Charts");
+		predictionChart = new JButton("Product Monthly Sales");
+		allCharts = new JButton("All Products Sales");
 
 		productField.setEditable(false);
 		idField.setEditable(false);
+		expensesField.setEditable(false);
 		incomeField.setEditable(false);
-		expenditureField.setEditable(false);
 
 		idField.setBounds(9, 50, 93, 300);
+		productValueLabel.setBounds(65, 10, 200, 20);
+		productField.setBounds(65, 40, 200, 215);
+		expensesQuantityLabel.setBounds(285, 20, 93, 23);
+		incomeQuantityLabel.setBounds(405, 20, 93, 23);
+		expensesField.setBounds(280, 40, 100, 215);
+		incomeField.setBounds(385, 40, 100, 215);
 
-		productValueLabel.setBounds(100, 10, 93, 14);
-		productField.setBounds(100, 50, 200, 300);
-
-		quantityLabel.setBounds(309, 10, 93, 14);
-		incomeField.setBounds(309, 50, 100, 300);
-		expenditureField.setBounds(419, 50, 100, 300);
-
-		// productField.setColumns(15);
-
-		// setProductTextField(0,stockDBControl.getStockList());
-		// public void setOrderTextField(0, ord ){
 		calculateBarChartValues();
 
-		viewBarChartButton.setBounds(400, 400, 100, 20);
+		chartsHeaderLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+		productValueLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+
+		chartsHeaderLabel.setBounds(65, 250, 150, 30);
+
+		viewBarChartButton.setBounds(320, 285, 170, 30);
 		viewBarChartButton.addActionListener(this);
 
-		predictionChart.setBounds(500, 400, 100, 20);
+		allCharts.setBounds(320, 320, 170, 30);
+		allCharts.addActionListener(this);
+
+		predictionChart.setBounds(65, 320, 225, 30);
 		predictionChart.addActionListener(this);
 
-		// add(frame1);
-		// add(frame);
-		add(accountingIncomeOrderProductLabel);
-		add(productValueLabel);
-		add(quantityLabel);
+		mainPanel.add(productValueLabel);
+		mainPanel.add(expensesQuantityLabel);
+		mainPanel.add(incomeQuantityLabel);
+		mainPanel.add(chartsHeaderLabel);
+		mainPanel.add(expensesField);
 
-		// add(idField);
-		add(incomeField);
+		mainPanel.add(productField);
+		mainPanel.add(incomeField);
+		mainPanel.add(viewBarChartButton);
+		mainPanel.add(predictionChart);
+		mainPanel.add(allCharts);
 
-		add(productField);
-		add(expenditureField);
-		add(viewBarChartButton);
-		add(predictionChart);
-
+		initializeExpenses();
 		stockList.setCellRenderer(renderer);
 
 		setLayout(null);
 		setVisible(true);
-		// productField.append("\n " + "Sales" );
 		refreshAccountingTab();
-		showCustomerOrders();
-
-		System.out.println("---------------" + itemsPrice.get(0).intValue());
-
 	}
 
 	public JButton getViewBarChartButton() {
@@ -152,139 +153,130 @@ public class AccountingTab extends JPanel implements ActionListener, ItemListene
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == viewBarChartButton) {
-
-			BarChartDemo1 demo = new BarChartDemo1("Bar Chart Demo", account.getFirstquarter2014(),
+			BarChartSales demo = new BarChartSales("Sales History", account.getFirstquarter2014(),
 					account.getSecondquarter2014(), account.getThirdquarter2014(), account
 							.getFourthquarter2014(), account.getFirstquarter2013(), account
 							.getSecondquarter2013(), account.getThirdquarter2013(), account
 							.getFourthquarter2013(), account.getFirstquarter2012(), account
 							.getSecondquarter2012(), account.getThirdquarter2012(), account
 							.getFourthquarter2012());
-			demo.pack();
-			// RefineryUtilities.centerFrameOnScreen(demo);
-			demo.setDefaultCloseOperation(0);
-			demo.setVisible(true);
-
 		}
+
 		if (e.getSource() == predictionChart) {
-
 			PredictionChart predictionChart = new PredictionChart();
-			// predictionChart.buildPredictionChart(stockDBControl.getStockList().get(0).getProduct(),orderDB.getCustomerOrderList());
-
-			predictionChart.buildPredictionChart(stockDBControl, orderDB);
-			Prediction01 pred = new Prediction01(stockDBControl.getStockList().get(0).getProduct(),
-					orderDB.getCustomerOrderList());
-			// System.out.println("prediciton douubles: " + pred.getPredictionDoubles()[10]);
-			for (int i = 0; i < 40; i++) {
-				System.out.println("prediciton doubles: " + i + "  " + pred.getPredictionInts()[i]);
-
-			}
-
-			// orderDB.getCustomerOrderList().get(0);
+			predictionChart.buildPredictionChart(driver);
 		}
 
-	}
-
-	public void setTextField(ArrayList<StockItem> list) {
-		System.out.println("test!!");
-		listModel.clear();
-		// stockList.setSelectedIndex(orderListIndex);
-
-		Double total = 0.0;
-		for (StockItem stockItem : list) {
-			int quantity = stockItem.getQuantity();
-			Double price = stockItem.getProduct().getRetailPrice();
-			Double supplierprice = stockItem.getProduct().getSupplierPrice();
-			System.out.println(price);
-			total += stockItem.getQuantity() * price;
-			suppliertotal += stockItem.getQuantity() * supplierprice;
-
-			System.out.println("new total" + total);
-
-			// expenditureField.append("\n" + quantity);
-		}
-		productField.append("\n Stock");
-
-		expenditureField.append("\n" + suppliertotal);
-
-		// productField.append("\n retail price ");
-		System.out.println("total" + total);
-		// incomeField.append("\n\n" + total);
-		if (list.size() > 0) {
-			emptiedList = false;
+		if (e.getSource() == allCharts) {
+			AllProductsChart allProductsChart = new AllProductsChart();
+			allProductsChart.buildPredictionChart(driver);
 		}
 	}
 
 	public void refreshAccountingTab() {
-		setTextField(stockDBControl.getStockList());
+		clearAccountsFields();
+		fillUpProductComboBox();
+		showCustomerOrders();
+
+		setUpProductComboBox();
 	}
 
-	public void setIncomeTotal() {
-		Account account;
-		// double total = account;
+	private void clearAccountsFields() {
+		productField.setText("");
+		expensesField.setText("");
+		incomeField.setText("");
+	}
+
+	private void fillUpProductComboBox() {
+
+		ArrayList<StockItem> list = driver.getStockDB().getStockList();
+		comboBoxItems.clear();
+		itemsQuantity.clear();
+		itemsPrice.clear();
+		for (StockItem stockItem : list) {
+			comboBoxItems.add(stockItem.getProduct().getProductName());
+			itemsPrice.add(stockItem.getProduct().getRetailPrice());
+			itemsQuantity.add(stockItem.getQuantity());
+		}
+		productComboBox.setSelectedIndex(list.size() - 1);
+	}
+
+	private void setUpProductComboBox() {
+
+		productComboBox.setBounds(65, 290, 225, 23);
+		mainPanel.add(productComboBox);
+		fillUpProductComboBox();
+		productComboBox.addItemListener(this);
 	}
 
 	public void showCustomerOrders() {
-		Double total = 0.0;
-		Double suppliertotal = 0.0;
+
+		int total = 0;
+		int suppliertotal = 0;
 		Order order = null;
-		for (int i = 0; i < orderDB.getCustomerOrderList().size(); i++) {
-			order = (orderDB.getCustomerOrderList().get(i));
+		for (int i = 0; i < driver.getOrderDB().getCustomerOrderList().size(); i++) {
+			order = (driver.getOrderDB().getCustomerOrderList().get(i));
 
-			total += order.getGrandTotalOfOrder();
-			suppliertotal += order.getGrandTotalOfOrder() / 1.2;
-			order.setTotalExpenditure(total + suppliertotal);
+			total += (int) order.getGrandTotalOfOrder();
+			suppliertotal += (int) order.getGrandTotalOfOrder() / 1.2;
 		}
-		productField.append("\n Stock Sold ");
+		int netProfit = (total - (suppliertotal + account.getExpenses() + account.getRent() + account
+				.getWages()));
 
-		productField.append("\n grand total of orders ");
-		incomeField.append("\n\n\n" + total);
-		expenditureField.append("\n" + suppliertotal);
-		expenditureField.append("\n\n\n\n\n" + order.getTotalExpenditure());
+		productField.append("\n Sales");
+		productField.append("\n Cost Of Sales ");
+		productField.append("\n\n Expenses ");
+		productField.append("\n Rent ");
+		productField.append("\n Wages ");
+		productField.append("\n\n Net Profit ");
 
+		expensesField.setForeground(Color.RED);
+		expensesField.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		incomeField.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+
+		incomeField.append("\n" + total);
+		expensesField.append("\n\n" + suppliertotal);
+		expensesField.append("\n\n" + account.getExpenses());
+		expensesField.append("\n" + account.getRent());
+		expensesField.append("\n" + account.getWages());
+		incomeField.append("\n\n\n\n\n\n\n" + netProfit);
 	}
 
 	public ArrayList<ChartDataHolder> calculateBarChartValues() {
-		for (int i = 0; i < orderDB.getCustomerOrderList().size(); i++) {
-			Order order = (orderDB.getCustomerOrderList().get(i));
+
+		for (int i = 0; i < driver.getOrderDB().getCustomerOrderList().size(); i++) {
+			Order order = (driver.getOrderDB().getCustomerOrderList().get(i));
 			order.getDate();
 			ChartDataHolder chartDataHolder = new ChartDataHolder(order.getGrandTotalOfOrder());
 			arr.add(chartDataHolder);
-
 			itemsPrice.add(order.getGrandTotalOfOrder());
-
-			System.out.println("date: " + order.getDate() + "total sales: "
-					+ order.getGrandTotalOfOrder());
-
 			account.dateCheckchecker(order.getDate(), order.getGrandTotalOfOrder());
-
-			System.out.println("........." + itemsPrice.toString());
-			// System.out.println("year!! " + year);
 		}
-		// System.out.println("sales..." + arr.);
 		return arr;
-
 	}
 
-	public void setStockDBControl(StockDB stockDBControl) {
-		this.stockDBControl = stockDBControl;
+	public JComboBox getProductCombobox() {
+		return productComboBox;
 	}
 
 	public void showOrderDetails(Order order) {
-		expenditureField.append("\n" + order.getGrandTotalOfOrder());
-
+		incomeField.append("\n" + order.getGrandTotalOfOrder());
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void itemStateChanged(ItemEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 
+	public void initializeExpenses() {
+
+		account.setExpenses(expenses);
+		account.setRent(rent);
+		account.setWages(wages);
+	}
 }

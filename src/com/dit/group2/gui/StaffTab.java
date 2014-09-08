@@ -17,6 +17,7 @@ import com.dit.group2.retailSystem.RetailSystemDriver;
 public class StaffTab extends PersonTab {
 
 	private boolean enablePasswordEdit;
+	private Staff currentlyLoggedInStaff;
 	private String password, password2, accessLevel;
 	private JTextField passwordField1, passwordField2, accessLevelField;
 	private JLabel passwordLabel1, passwordLabel2, accessLevelLabel;
@@ -63,9 +64,10 @@ public class StaffTab extends PersonTab {
 	 * 
 	 * @param driver
 	 */
-	public StaffTab(RetailSystemDriver driver) {
+	public StaffTab(Staff currentlyLoggedInStaff,RetailSystemDriver driver) {
 		// Field and label setup
 		super(driver);
+		this.currentlyLoggedInStaff = currentlyLoggedInStaff;
 		titleLabel.setText("Staff Form");
 		enablePasswordEdit = false;
 		passwordLabel1 = new JLabel("Password");
@@ -95,7 +97,7 @@ public class StaffTab extends PersonTab {
 		accessLevelLabel.setBounds(59, 160, 94, 20);
 		passwordLabel1.setBounds(59, 185, 93, 20);
 		passwordLabel2.setBounds(59, 210, 130, 20);
-
+		
 		// Set tool tips for clickable buttons
 		newPersonButton.setToolTipText("Click to add a staff member.");
 		editPersonButton.setToolTipText("Click to edit the details of the current staff member.");
@@ -103,13 +105,8 @@ public class StaffTab extends PersonTab {
 		cancelEditButton.setToolTipText("Click to cancel editing the current staff member.");
 		cancelButton.setToolTipText("Click to exit the new staff member screen.");
 		submitButton.setToolTipText("Submit changes/new staff member.");
-
-		// Set tool tips for combobox items
 		comboBox.setToolTipText("Click to view the details of another staff member.");
-
-		// Other tool tips...
-		accessLevelField
-				.setToolTipText("Access levels: 1) Employee, 2) Manager (Privileged access)");
+		accessLevelField.setToolTipText("Access levels: 1) Employee, 2) Manager (Privileged access)");
 
 		// Finish adding elements to the panel
 		setTextField(0, driver.getPersonDB().getStaffList());
@@ -210,9 +207,11 @@ public class StaffTab extends PersonTab {
 				}
 				// Edit mode selected
 				if (editMode) {
+					System.out.println(valid);
 					if (valid) {
 						driver.getPersonDB().changePersonDetails(person, name, email,
 								contactNumber, address, aLevel, password, null, null);
+						System.out.println("Done");
 						setTextField(getIndex(driver.getPersonDB().getStaffList()), driver
 								.getPersonDB().getStaffList());
 					}
@@ -312,35 +311,37 @@ public class StaffTab extends PersonTab {
 		}
 		// Cancel button clicked
 		if (e.getSource() == cancelButton) {
-
+			passwordLabel1.setForeground(Color.black);
+			passwordLabel2.setForeground(Color.black);
+			accessLevelLabel.setForeground(Color.black);
 			setFieldEditable(false);
 			togglePasswordField();
 			setTextField(driver.getPersonDB().getStaffList().size() - 1, driver.getPersonDB()
 					.getStaffList());
 			if (!(driver.getPersonDB().getStaffList().size() > 0))
 				clearTextFields(driver.getPersonDB().getStaffList());
-
-			accessLevelLabel.setForeground(Color.black);
-			passwordLabel1.setForeground(Color.black);
-			passwordLabel2.setForeground(Color.black);
 		}
 		// Cancel button clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
+			passwordLabel1.setForeground(Color.black);
+			passwordLabel2.setForeground(Color.black);
+			accessLevelLabel.setForeground(Color.black);
 			setTextField(getIndex(driver.getPersonDB().getStaffList()), driver.getPersonDB()
 					.getStaffList());
 			setFieldEditable(false);
 			togglePasswordField();
 			if (!(driver.getPersonDB().getStaffList().size() > 0))
 				clearTextFields(driver.getPersonDB().getStaffList());
-
-			accessLevelLabel.setForeground(Color.black);
-			passwordLabel1.setForeground(Color.black);
-			passwordLabel2.setForeground(Color.black);
 		}
 
 		// Delete button clicked
 		if (e.getSource() == deletePersonButton) {
-			deletePerson(person, driver.getPersonDB().getStaffList());
+			if(currentlyLoggedInStaff!=person)
+				deletePerson(person, driver.getPersonDB().getStaffList());
+			else if(currentlyLoggedInStaff.getId()==0)
+				JOptionPane.showMessageDialog(null, "The default admin account cannot be deleted!");
+			else
+				JOptionPane.showMessageDialog(null, "You are not allowed delete your own user account!");
 		}
 		revalidate();
 		repaint();

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -74,6 +75,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	private JTextField quantityTextField;
 	private JButton addButton, removeButton, processButton, cancelButton;
 	private double grandTotal = 0;
+	private Product selectedProduct;
 
 	private TabListCellRenderer renderer = new TabListCellRenderer(false);
 
@@ -105,28 +107,27 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		orderingList();
 		refreshTab(0);
 
+		setLayout(null);
+		setVisible(true);
+		
 		// Set tool tips for clickable buttons
 		addButton.setToolTipText("Click to add an order from this supplier.");
 		removeButton.setToolTipText("Click to remove an order.");
 		processButton.setToolTipText("Click to process the order from this supplier.");
 		cancelButton.setToolTipText("Click to remove all orders from this supplier.");
-
+		
 		// Set tool tips for combobox items
 		productComboBox.setToolTipText("Click to select which product to order.");
 		supplierComboBox.setToolTipText("Click to select which supplier to order from.");
-
-		// Other tool tips...
-
-		setLayout(null);
-		setVisible(true);
+		
 	}
 
 	/** add customer combo box */
 	private void setUpSupplierComboBox() {
 		supplierComboBoxLabel = new JLabel("Suppliers");
-		supplierComboBoxLabel.setBounds(59, 33, 93, 20);
+		supplierComboBoxLabel.setBounds(59,6, 93, 23);
 		mainPanel.add(supplierComboBoxLabel);
-		supplierComboBox.setBounds(200, 30, 265, 23);
+		supplierComboBox.setBounds(200, 7, 265, 23);
 		mainPanel.add(supplierComboBox);
 		fillUpSupplierComboBox();
 		supplierComboBox.addItemListener(this);
@@ -135,8 +136,8 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	/** add product combo box */
 	private void setUpProductComboBox() {
 		productComboBoxLabel = new JLabel("Products");
-		productComboBoxLabel.setBounds(59, 55, 265, 20);
-		productComboBox.setBounds(200, 55, 265, 23);
+		productComboBoxLabel.setBounds(59, 32, 265, 20);
+		productComboBox.setBounds(200, 32, 265, 23);
 		mainPanel.add(productComboBoxLabel);
 		mainPanel.add(productComboBox);
 		fillUpProductComboBox();
@@ -149,16 +150,16 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		supplierIDLabel.setBounds(59, 10, 93, 20);
 		supplierIDField = new JLabel();
 		supplierIDField.setBounds(203, 7, 265, 23);
-		mainPanel.add(supplierIDLabel);
-		mainPanel.add(supplierIDField);
+		/*mainPanel.add(supplierIDLabel);
+		mainPanel.add(supplierIDField);*/
 	}
 
 	/** add product quantity field */
 	private void setUpQuantityTextField() {
 		quantityLabel = new JLabel("Order Quantity");
-		quantityLabel.setBounds(59, 130, 110, 20);
+		quantityLabel.setBounds(59, 106, 110, 23);
 		quantityTextField = new JTextField("1");
-		quantityTextField.setBounds(200, 133, 50, 23);
+		quantityTextField.setBounds(200, 109, 50, 23);
 		mainPanel.add(quantityLabel);
 		mainPanel.add(quantityTextField);
 	}
@@ -166,13 +167,13 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	/** add product available quantity */
 	private void setUpAvailableQuantity() {
 		availableQuantityLabel = new JLabel("Quantity in Stock");
-		availableQuantityLabel.setBounds(59, 83, 140, 20);
+		availableQuantityLabel.setBounds(59, 56, 140, 23);
 		int quantity = 0;
 		if (itemsQuantity.size() > 0) {
 			quantity = itemsQuantity.get(0);
 		}
 		availableQuantityField = new JLabel(Integer.toString(quantity));
-		availableQuantityField.setBounds(200, 83, 93, 20);
+		availableQuantityField.setBounds(200, 60, 93, 14);
 		mainPanel.add(availableQuantityLabel);
 		mainPanel.add(availableQuantityField);
 	}
@@ -180,13 +181,13 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	/** add product price fields */
 	private void setUpPriceFields() {
 		priceLabel = new JLabel("Unit Price");
-		priceLabel.setBounds(59, 108, 93, 14);
+		priceLabel.setBounds(59, 85, 93, 14);
 		double price = 0;
 		if (itemsPrice.size() > 0) {
 			price = itemsPrice.get(0);
 		}
 		priceField = new JLabel(formatter.format(price));
-		priceField.setBounds(200, 108, 93, 14);
+		priceField.setBounds(200, 85, 93, 14);
 		mainPanel.add(priceLabel);
 		mainPanel.add(priceField);
 	}
@@ -207,7 +208,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	private void setAddButton() {
 		addButton = new JButton("+");
 		addButton.setFont(new Font("Arial", Font.BOLD, 22));
-		addButton.setBounds(270, 133, 93, 20);
+		addButton.setBounds(270, 110, 93, 20);
 		addButton.addActionListener(this);
 		mainPanel.add(addButton);
 	}
@@ -217,7 +218,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		removeButton = new JButton("-");
 		removeButton.setFont(new Font("Arial", Font.BOLD, 35));
 
-		removeButton.setBounds(380, 133, 93, 20);
+		removeButton.setBounds(380, 110, 93, 20);
 		removeButton.addActionListener(this);
 		mainPanel.add(removeButton);
 		removeButton.setEnabled(false);
@@ -243,20 +244,20 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	/** add buying list */
 	private void orderingList() {
 		orderListProductLabel = new JLabel("Product name");
-		orderListProductLabel.setBounds(59, 155, 110, 20);
+		orderListProductLabel.setBounds(59, 140, 110, 20);
 		orderListQtyLabel = new JLabel("Qty");
-		orderListQtyLabel.setBounds(275, 155, 30, 20);
+		orderListQtyLabel.setBounds(275, 140, 30, 20);
 		orderListPriceLabel = new JLabel("Price");
-		orderListPriceLabel.setBounds(340, 155, 50, 20);
+		orderListPriceLabel.setBounds(340, 140, 50, 20);
 		orderListTotalPriceLabel = new JLabel("Total");
-		orderListTotalPriceLabel.setBounds(420, 155, 50, 20);
+		orderListTotalPriceLabel.setBounds(420, 140, 50, 20);
 		mainPanel.add(orderListProductLabel);
 		mainPanel.add(orderListQtyLabel);
 		mainPanel.add(orderListPriceLabel);
 		mainPanel.add(orderListTotalPriceLabel);
 
 		orderingList.addListSelectionListener(this);
-		orderingListSroll.setBounds(59, 180, 420, 135);
+		orderingListSroll.setBounds(59, 157, 420, 157);
 
 		mainPanel.add(orderingListSroll);
 
@@ -267,41 +268,51 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 	public JComboBox<String> getSupplierComboBox() {
 		return supplierComboBox;
 	}
+	
+	public JComboBox<String> getProductComboBox() {
+		return productComboBox;
+	}
 
 	/** fill up customer combo Box */
 	public void fillUpSupplierComboBox() {
-
 		supplierComboBoxItems.clear();
 		supplierComboBoxItems.add("<html><font color='red'>Select Supplier</font></html>");
-
-		ArrayList<Person> customers = driver.getPersonDB().getSupplierList();
-		for (Person customer : customers) {
-			supplierComboBoxItems.add(customer.getName());
+		ArrayList<Person> suppliers = driver.getPersonDB().getSupplierList();
+		String item = "";
+		for (Person supplier : suppliers) {
+			item = "\t" + supplier.getId() + " \t - \t " + supplier.getName();
+			supplierComboBoxItems.add(item);
 		}
-		supplierComboBox.setSelectedIndex(customers.size() - 1);
+		supplierComboBox.setSelectedIndex(suppliers.size() - 1);
+		revalidate();
+		repaint();
 
 	}
 
 	/** fill up product combo Box with price and quantity */
-	private void fillUpProductComboBox() {
-		ArrayList<StockItem> list = driver.getStockDB().getStockList();
+	public void fillUpProductComboBox() {
+		ArrayList<StockItem> productComboboxList = driver.getStockDB().getStockList();
 		comboBoxItems.clear();
 		itemsQuantity.clear();
 		itemsPrice.clear();
-		for (StockItem stockItem : list) {
-			System.out.println(supplierComboBox.getSelectedItem());
-			if (stockItem.getProduct().getSupplier().getName().equals(
-					supplierComboBox.getSelectedItem())) {
+		
+		for (StockItem stockItem : productComboboxList) {
+			String values[] = supplierComboBox.getSelectedItem().toString().split("\\t");
+			if (stockItem.getProduct().getSupplier().getId()==(
+					Integer.parseInt(values[1].trim()))) {
 				comboBoxItems.add(stockItem.getProduct().getProductName());
 				itemsPrice.add(stockItem.getProduct().getSupplierPrice());
 				itemsQuantity.add(stockItem.getQuantity());
 			}
 		}
+	
 		productComboBox.setSelectedIndex(comboBoxItems.size() - 1);
+		revalidate();
+		repaint();
 	}
 
 	/** refresh Tab */
-	private void refreshTab(int index) {
+	public void refreshTab(int index) {
 		if (index > -1) {
 			if (itemsPrice.size() > 0)
 				priceField.setText(formatter.format(itemsPrice.get(index)));
@@ -316,7 +327,18 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 							.get((supplierComboBox.getSelectedIndex() - 1)).getId()));
 				}
 			}
+			if(productComboBox.getSelectedItem()!=null)
+				if(driver.getStockDB().getProductByName(productComboBox.getSelectedItem().toString())!=null){
+					availableQuantityField.setText(""+driver.getStockDB().getProductByName(productComboBox.getSelectedItem().toString()).getQuantity());
+					priceField.setText(""+driver.getStockDB().getProductByName(productComboBox.getSelectedItem().toString()).getProduct().getSupplierPrice());
+				}
+				else{
+					availableQuantityField.setText("0");
+					priceField.setText("0.00");
+				}
 		}
+		revalidate();
+		repaint();
 	}
 
 	/** combo box selection */
@@ -328,6 +350,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 				refreshTab(productComboBox.getSelectedIndex());
 			}
 		}
+		
 	}
 
 	/** button actions */
@@ -339,58 +362,48 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 
 			// add product and quantity to the current order list
 			int index = productComboBox.getSelectedIndex();
-
-			Product selectedProduct = driver.getStockDB().getStockList().get(index).getProduct();
-
-			int availableQuantity = itemsQuantity.get(index);
+			if(productComboBox.getSelectedItem()!=null)
+				selectedProduct = driver.getStockDB().getProductByName(productComboBox.getSelectedItem().toString()).getProduct();  
 
 			// accepting only integer into quantityTextField
 			try {
 				int orderingQuantity = (Integer.parseInt(quantityTextField.getText()));
 
-				if (orderingQuantity > 0) {
+				if (orderingQuantity > 0) {	
+					processButton.setEnabled(true);
+					
+					// refresh subtotal price
+					grandTotal += (selectedProduct.getSupplierPrice() * orderingQuantity);
 
-					// check if there is enough product available to buy
-					if (orderingQuantity <= availableQuantity) {
-						processButton.setEnabled(true);
-						// set available quantity
-						itemsQuantity.set(index, availableQuantity - orderingQuantity);
+					// check if the selected product is already in the currentOrderList
+					int orderListIndex = currentOrderList.indexOf(selectedProduct);
+					if (orderListIndex >= 0) {
+						orderingQuantity += currentOrderListQuantity.get(orderListIndex);
+						currentOrderListQuantity.set(orderListIndex, orderingQuantity);
 
-						// refresh subtotal price
-						grandTotal += (selectedProduct.getRetailPrice() * orderingQuantity);
+						listModel.setElementAt(textAlignment(comboBoxItems.get(index), Integer
+								.toString(orderingQuantity), priceField.getText(), formatter
+								.format(orderingQuantity * selectedProduct.getSupplierPrice())),
+								orderListIndex);
+						orderingList.setSelectedIndex(orderListIndex);
 
-						// check if the selected product is already in the currentOrderList
-						int orderListIndex = currentOrderList.indexOf(selectedProduct);
-						if (orderListIndex >= 0) {
-							orderingQuantity += currentOrderListQuantity.get(orderListIndex);
-							currentOrderListQuantity.set(orderListIndex, orderingQuantity);
-
-							listModel.setElementAt(textAlignment(comboBoxItems.get(index), Integer
-									.toString(orderingQuantity), priceField.getText(), formatter
-									.format(orderingQuantity * selectedProduct.getRetailPrice())),
-									orderListIndex);
-							orderingList.setSelectedIndex(orderListIndex);
-
-						}
-						// selected product is NOT on the currntOrderList
-						else {
-							currentOrderList.add(selectedProduct);
-							currentOrderListQuantity.add(orderingQuantity);
-							listModel.addElement(textAlignment(comboBoxItems.get(index),
-									quantityTextField.getText(), priceField.getText(), formatter
-											.format(orderingQuantity
-													* selectedProduct.getRetailPrice())));
-							validate();
-							scrollBar.setValue(scrollBar.getMaximum());
-							orderingList.setSelectedIndex(listModel.getSize() - 1);
-						}
-						supplierComboBox.setEnabled(false);
-						removeButton.setEnabled(true);
-						cancelButton.setEnabled(true);
-						refreshTab(index);
 					}
-					else
-						JOptionPane.showMessageDialog(null, "Not enough product in stock!");
+					// selected product is NOT on the currntOrderList
+					else {
+						currentOrderList.add(selectedProduct);
+						currentOrderListQuantity.add(orderingQuantity);
+						listModel.addElement(textAlignment(comboBoxItems.get(index),
+								quantityTextField.getText(), priceField.getText(), formatter
+										.format(orderingQuantity
+												* selectedProduct.getSupplierPrice())));
+						validate();
+						scrollBar.setValue(scrollBar.getMaximum());
+						orderingList.setSelectedIndex(listModel.getSize() - 1);
+					}
+					supplierComboBox.setEnabled(false);
+					removeButton.setEnabled(true);
+					cancelButton.setEnabled(true);
+					refreshTab(index);
 				}
 				else
 					JOptionPane.showMessageDialog(null,
@@ -400,27 +413,17 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 			catch (NumberFormatException error) {
 				JOptionPane.showMessageDialog(null,
 						"Invalid entry, only positive whole numbers please!");
-				// error.printStackTrace();
+				error.printStackTrace();
 			}
 		}
 
 		// REMOVE BUTTON
 		if (e.getSource() == removeButton) {
-			int index = orderingList.getSelectedIndex();
-			int i = 0; // index in combo list or stock list
-
-			for (StockItem stockItem : driver.getStockDB().getStockList()) {
-				if (stockItem.getProduct().getProductID() == currentOrderList.get(index)
-						.getProductID()) {
-					break;
-				}
-				i++;
-			}
-
-			Product selectedProduct = driver.getStockDB().getStockList().get(i).getProduct();
-
-			int availableQuantity = itemsQuantity.get(i);
-
+			int orderingListIndex = orderingList.getSelectedIndex();
+			int productComboBoxIndex = productComboBox.getSelectedIndex(); // index in combo list or stock list
+			String[] values = ((String)listModel.getElementAt(orderingListIndex)).split("\\t");
+			selectedProduct = driver.getStockDB().getProductByName(values[0].trim()).getProduct();
+			
 			// accepting only integer into quantityTextField
 			try {
 				int orderingQuantity = (Integer.parseInt(quantityTextField.getText()));
@@ -428,28 +431,27 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 				if (orderingQuantity > 0) {
 					processButton.setEnabled(true);
 					// set available quantity
-					itemsQuantity.set(i, availableQuantity + orderingQuantity);
-					grandTotal -= (currentOrderList.get(index).getRetailPrice() * Integer
+					itemsQuantity.set(productComboBoxIndex, orderingQuantity);
+					grandTotal -= (currentOrderList.get(orderingListIndex).getSupplierPrice() * Integer
 							.parseInt(quantityTextField.getText()));
 
 					// check if the selected product is already in the currentOrderList
-					int orderListIndex = currentOrderList.indexOf(selectedProduct);
-					if (orderListIndex >= 0 && (currentOrderListQuantity.get(orderListIndex) > 1)) {
-						orderingQuantity = currentOrderListQuantity.get(orderListIndex)
+					if (orderingListIndex >= 0 && (currentOrderListQuantity.get(orderingListIndex) > 1)) {
+						orderingQuantity = currentOrderListQuantity.get(orderingListIndex)
 								- (Integer.parseInt(quantityTextField.getText()));
-						currentOrderListQuantity.set(orderListIndex, orderingQuantity);
+						currentOrderListQuantity.set(orderingListIndex, orderingQuantity);
 
-						listModel.setElementAt(textAlignment(comboBoxItems.get(index), Integer
+						listModel.setElementAt(textAlignment(comboBoxItems.get(productComboBoxIndex), Integer
 								.toString(orderingQuantity), priceField.getText(), formatter
-								.format(orderingQuantity * selectedProduct.getRetailPrice())),
-								orderListIndex);
-						orderingList.setSelectedIndex(orderListIndex);
+								.format(orderingQuantity * selectedProduct.getSupplierPrice())),
+								orderingListIndex);
+						orderingList.setSelectedIndex(orderingListIndex);
 
 					}
 					else {
-						currentOrderList.remove(index);
-						currentOrderListQuantity.remove(index);
-						listModel.remove(index);
+						currentOrderList.remove(orderingListIndex);
+						currentOrderListQuantity.remove(orderingListIndex);
+						listModel.remove(orderingListIndex);
 
 					}
 					removeButton.setEnabled(true);
@@ -463,7 +465,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 			catch (NumberFormatException error) {
 				JOptionPane.showMessageDialog(null,
 						"Invalid entry, only positive whole numbers please!");
-				// error.printStackTrace();
+				error.printStackTrace();
 			}
 			if (listModel.isEmpty()) {
 				supplierComboBox.setEnabled(true);
@@ -471,7 +473,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 				processButton.setEnabled(false);
 				cancelButton.setEnabled(false);
 			}
-			refreshTab(i);
+			refreshTab(productComboBoxIndex);
 		}
 
 		// PROCESS BUTTON
@@ -490,29 +492,11 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 			Supplier customer = (Supplier) driver.getPersonDB().getSupplierList().get(
 					supplierComboBox.getSelectedIndex() - 1);
 
-			// Staff responsibleStaffForOrder = (Staff)driver.getPersonDB().getStaffList().get(0);
-
 			// make a new order and put it to the orderDB
 			Order order = new Order(currentlyLoggedInStaff, customer, orderStockItemList,
 					grandTotal, new java.util.Date());
 			driver.getOrderDB().getSupplyOrderList().add(order);
 
-			// this.customer = customer;
-			for (StockItem stockItem : orderStockItemList) {
-				System.out.println("Q=" + stockItem.getQuantity() + " P="
-						+ stockItem.getProduct().getProductName());
-
-			}
-
-			// reduce the products' quantity in stockDBControl
-			int quantity;
-			for (int index = 0; index < currentOrderList.size(); index++) {
-				quantity = driver.getStockDB().getStockItem(
-						currentOrderList.get(index).getProductID()).getQuantity();
-				quantity -= currentOrderListQuantity.get(index);
-				driver.getStockDB().getStockItem(currentOrderList.get(index).getProductID())
-						.setQuantity(quantity);
-			}
 
 			// driver.getGui().getSupplierTab().addItemsToOrderCombobox(true);
 			driver.getGui().getSupplyOrderHistorytab().setOrderList();
@@ -534,44 +518,22 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		}
 		// CANCEL BUTTON
 		if (e.getSource() == cancelButton) {
-			do {
-
-				int index = orderingList.getSelectedIndex();
-				int i = 0; // index in combo list or stock list
-
-				for (StockItem stockItem : driver.getStockDB().getStockList()) {
-					if (stockItem.getProduct().getProductID() == currentOrderList.get(index)
-							.getProductID()) {
-						break;
-					}
-					i++;
-				}
-
-				grandTotal -= (currentOrderList.get(index).getRetailPrice() * currentOrderListQuantity
-						.get(index));
-				itemsQuantity.set(i, itemsQuantity.get(i) + currentOrderListQuantity.get(index));
-				currentOrderList.remove(index);
-				currentOrderListQuantity.remove(index);
-				listModel.remove(index);
-
-				if (listModel.isEmpty()) {
-					supplierComboBox.setEnabled(true);
-					removeButton.setEnabled(false);
-					processButton.setEnabled(false);
-				}
-				if (index != 0)
-					orderingList.setSelectedIndex(index - 1);
-				else
-					orderingList.setSelectedIndex(0);
-				refreshTab(i);
-			}
-			while (listModel.getSize() != 0);
+			
+			grandTotal = 0;
+			currentOrderList.clear();
+			currentOrderList.clear();
+			currentOrderListQuantity.clear();
+			listModel.clear();
+			supplierComboBox.setEnabled(true);
+			removeButton.setEnabled(false);
+			processButton.setEnabled(false);
+			refreshTab(0);
 			cancelButton.setEnabled(false);
 		}
 	}
 
 	private void showOrderDetails(Order order) {
-		String orderDetailsMessage = "New order was created at " + order.getDate();
+		String orderDetailsMessage = "New order was created at " + order.getDateString();
 		orderDetailsMessage += "\nStaff ID : " + order.getCurrentlyLoggedInStaff().getId();
 		orderDetailsMessage += "\nSupplier ID : " + order.getPerson().getId() + " Supplier name : "
 				+ order.getPerson().getName();
@@ -579,7 +541,7 @@ public class SupplyOrderTab extends GuiLayout implements ActionListener, ItemLis
 		for (StockItem stockItem : order.getOrderEntryList()) {
 			orderDetailsMessage += "\n   " + stockItem.getQuantity() + " x "
 					+ stockItem.getProduct().getProductName() + " \t Subtotal \t\u20ac"
-					+ (stockItem.getProduct().getRetailPrice() * stockItem.getQuantity());
+					+ (stockItem.getProduct().getSupplierPrice() * stockItem.getQuantity());
 		}
 
 		orderDetailsMessage += "\nThe total order value is \t\u20ac" + order.getGrandTotalOfOrder()

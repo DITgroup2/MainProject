@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.ToolTipManager;
 
+import com.dit.group2.order.Order;
 import com.dit.group2.person.Person;
 import com.dit.group2.person.Supplier;
 import com.dit.group2.retailSystem.RetailSystemDriver;
@@ -51,6 +52,7 @@ public class SupplierTab extends PersonTab {
 		automaticItemSelection = true;
 		comboBox.setSelectedIndex(index);
 		addItemsToProductCombobox();
+		
 
 		// Reset the view
 		revalidate();
@@ -121,7 +123,7 @@ public class SupplierTab extends PersonTab {
 		vatNumberField.setColumns(10);
 		contactNameLabel.setBounds(59, 160, 93, 14);
 		vatNumberLabel.setBounds(59, 185, 94, 14);
-
+		
 		// Set tool tips for clickable buttons
 		newPersonButton.setToolTipText("Click to add a new supplier.");
 		editPersonButton.setToolTipText("Click to edit the current supplier.");
@@ -129,10 +131,8 @@ public class SupplierTab extends PersonTab {
 		cancelEditButton.setToolTipText("Click to cancel editing the current supplier.");
 		cancelButton.setToolTipText("Click to exit the new supplier screen.");
 		submitButton.setToolTipText("Submit changes/new supplier.");
-
-		// Set tool tips for combobox items
-		// orderComboBox.setToolTipText("BLAHHHHHH");
 		comboBox.setToolTipText("Click to view the details of another supplier.");
+
 
 		// Finish setting up the tab
 		setTextField(0, driver.getPersonDB().getSupplierList());
@@ -170,20 +170,26 @@ public class SupplierTab extends PersonTab {
 		productsComboboxItems.clear();
 		String item = "<html><font color='red'>Add New Product</font></html>";
 		productsComboboxItems.add(item);
-		for (StockItem stockItem : driver.getStockDB().getStockList()) {
-			Product product = stockItem.getProduct();
-			if (product.getSupplier() == person) {
-				item = "PID:\t" + product.getProductID() + " \t " + "" + product.getProductName()
-						+ "";
-				productsComboboxItems.add(item);
+		if(driver.getPersonDB().getSupplierList().size()>0){
+			for (StockItem stockItem : driver.getStockDB().getStockList()) {
+				Product product = stockItem.getProduct();
+				if (product.getSupplier() == person) {
+					item = "PID:\t" + product.getProductID() + " \t " + "" + product.getProductName()
+							+ "";
+					productsComboboxItems.add(item);
+				}
 			}
+			productsComboBox.setSelectedIndex(productsComboBox.getItemCount() - 1);
 		}
-
-		productsComboBox.setSelectedIndex(productsComboBox.getItemCount() - 1);
+		else{
+			productsComboBox.removeAllItems();
+			productsComboBox.setSelectedItem(null);
+		}
 		automaticItemSelection = false;
 		revalidate();
 		repaint();
 	}
+
 
 	public void personDetailsForm() {
 		super.personDetailsForm();
@@ -291,6 +297,11 @@ public class SupplierTab extends PersonTab {
 		if (valid) {
 			productsComboBox.setEnabled(true);
 			setFieldEditable(false);
+			driver.getGui().getSupplyOrderTab().fillUpSupplierComboBox();
+			driver.getGui().getSupplyOrderTab().getSupplierComboBox().setSelectedIndex(driver.getPersonDB().getSupplierList().size());
+			
+			driver.getGui().getSupplyOrderTab().fillUpProductComboBox();
+			driver.getGui().getSupplyOrderTab().refreshTab(0);
 			valid = false;
 		}
 		// New supplier clicked
@@ -310,31 +321,30 @@ public class SupplierTab extends PersonTab {
 		// Cancel Clicked
 		if (e.getSource() == cancelButton) {
 			setFieldEditable(false);
+			vatNumberLabel.setForeground(Color.black);
+			contactNameLabel.setForeground(Color.black);
 			productsComboBox.setEnabled(true);
 			setTextField(driver.getPersonDB().getSupplierList().size() - 1, driver.getPersonDB()
 					.getSupplierList());
 			if (!(driver.getPersonDB().getSupplierList().size() > 0))
 				clearTextFields(driver.getPersonDB().getSupplierList());
-
-			contactNameLabel.setForeground(Color.black);
-			vatNumberLabel.setForeground(Color.black);
 		}
 		// Cancel clicked within edit mode
 		if (e.getSource() == cancelEditButton) {
+			vatNumberLabel.setForeground(Color.black);
+			contactNameLabel.setForeground(Color.black);
 			setTextField(getIndex(driver.getPersonDB().getSupplierList()), driver.getPersonDB()
 					.getSupplierList());
 			setFieldEditable(false);
 			productsComboBox.setEnabled(true);
 			if (!(driver.getPersonDB().getSupplierList().size() > 0))
 				clearTextFields(driver.getPersonDB().getSupplierList());
-
-			contactNameLabel.setForeground(Color.black);
-			vatNumberLabel.setForeground(Color.black);
 		}
 
 		// Delete supplier clicked
 		if (e.getSource() == deletePersonButton) {
 			deletePerson(person, driver.getPersonDB().getSupplierList());
+			addItemsToProductCombobox();
 		}
 
 		// New supplier selected
@@ -398,7 +408,6 @@ public class SupplierTab extends PersonTab {
 						driver.getGui().getProductTab().setSelectedProduct(
 								driver.getStockDB()
 										.getStockItem(Integer.parseInt(values[1].trim())));
-						JOptionPane.showMessageDialog(null, "H1");
 					}
 				}
 			}

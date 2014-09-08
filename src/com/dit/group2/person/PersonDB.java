@@ -84,9 +84,11 @@ public class PersonDB {
 	}
 	
 	public void automaticallyCreateStaff(){
+		person = new Staff("0","admin@msn.com","000000000","0","0",2);
+		staffList.add(person);
 		person = new Staff("Jim","jim@msn.com","0870227421","123 Main Street","pass",1);
 		staffList.add(person);
-		person = new Staff("0","john@msn.com","0867134552","38 Main Street","0",2);
+		person = new Staff("John","john@msn.com","0867134552","38 Main Street","password",2);
 		staffList.add(person);
 	}
 	

@@ -33,6 +33,7 @@ public class MainGUI extends JFrame implements ActionListener {
 	private JTabbedPane tabbedPane;
 	private JTabbedPane customerOrderTabbedPane;
 	private JTabbedPane supplyOrderTabbedPane;
+	private AccountingTab accountingTab;
 	private CustomerOrderHistoryTab customerOrderHistorytab;
 	private SupplyOrderHistoryTab supplyOrderHistorytab;
 	private SupplyOrderTab supplyOrderTab;
@@ -44,15 +45,15 @@ public class MainGUI extends JFrame implements ActionListener {
 	private CustomerTab customerTab;
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
-	private JMenu userMenu;
+	private JMenu settingsMenu;
 	private JMenu helpMenu;
-	private JMenuItem logoutMenuItem;
-	private JMenuItem exitMenuItem;
-	private JMenuItem openMenuItem;
-	private JMenuItem saveMenuItem;
-	private JMenuItem aboutMenuItem;
-	private JMenuItem howToMenuItem;
-	private AccountingTab accountingTab;
+	private JMenuItem logoutMenuItem, exitMenuItem, openMenuItem, saveMenuItem;
+	private JMenuItem aboutMenuItem, howToMenuItem;
+	private JMenu lookAndFeel;
+	private JMenu acryl, aluminium, graphite;
+	private JMenuItem acrylDefault, acrylLarge, acrylGiant;
+	private JMenuItem aluDefault, alulLarge, alulGiant;
+	private JMenuItem graphiteDefault, graphitelLarge, graphiteGiant;
 
 	private JFileChooser fileChooser;
 	private File file;
@@ -78,7 +79,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		int ySize = 580;
 		int xPosition = ((((int) tk.getScreenSize().getWidth()) - xSize) / 2);
 		int yPosition = ((((int) tk.getScreenSize().getHeight()) - ySize) / 2);
-		setSize(950, 700);
+		setSize(950, 750);
 
 		setLocationRelativeTo(null);
 		setResizable(true);
@@ -94,7 +95,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		// Create menu items
 		menuBar = new JMenuBar();
 		fileMenu = new JMenu("File", true);
-		userMenu = new JMenu("User", true);
+		settingsMenu = new JMenu("Settings", true);
 		helpMenu = new JMenu("Help", true);
 		logoutMenuItem = new JMenuItem("Logout");
 		exitMenuItem = new JMenuItem("Exit");
@@ -102,18 +103,44 @@ public class MainGUI extends JFrame implements ActionListener {
 		saveMenuItem = new JMenuItem("Save");
 		aboutMenuItem = new JMenuItem("About Group2");
 		howToMenuItem = new JMenuItem("User Guide");
+		lookAndFeel = new JMenu("Themes", true);
+		acryl = new JMenu("Noire");
+		aluminium = new JMenu("Aluminium");
+		graphite = new JMenu("Graphite");
+		aluDefault = new JMenuItem("Small Font");
+		alulLarge = new JMenuItem("Large Font");
+		alulGiant = new JMenuItem("Giant Font");
+		graphiteDefault = new JMenuItem("Small Font");
+		graphitelLarge = new JMenuItem("Large Font");
+		graphiteGiant = new JMenuItem("Giant Font");
+		acrylDefault = new JMenuItem("Small Font");
+		acrylLarge = new JMenuItem("Large Font");
+		acrylGiant = new JMenuItem("Giant Font");
 
 		// Add menu items to their relevant menu
 		fileMenu.add(openMenuItem);
 		fileMenu.add(saveMenuItem);
-		userMenu.add(logoutMenuItem);
-		userMenu.add(exitMenuItem);
+		fileMenu.add(logoutMenuItem);
+		fileMenu.add(exitMenuItem);
 		helpMenu.add(howToMenuItem);
 		helpMenu.add(aboutMenuItem);
+		settingsMenu.add(lookAndFeel);
+		lookAndFeel.add(acryl);
+		lookAndFeel.add(aluminium);
+		lookAndFeel.add(graphite);
+		acryl.add(acrylDefault);
+		acryl.add(acrylLarge);
+		acryl.add(acrylGiant);
+		aluminium.add(aluDefault);
+		aluminium.add(alulLarge);
+		aluminium.add(alulGiant);
+		graphite.add(graphiteDefault);
+		graphite.add(graphitelLarge);
+		graphite.add(graphiteGiant);
 
 		// Add the menus to the menu bar
 		menuBar.add(fileMenu);
-		menuBar.add(userMenu);
+		menuBar.add(settingsMenu);
 		menuBar.add(helpMenu);
 		setJMenuBar(menuBar);
 
@@ -124,6 +151,15 @@ public class MainGUI extends JFrame implements ActionListener {
 		saveMenuItem.addActionListener(this);
 		aboutMenuItem.addActionListener(this);
 		howToMenuItem.addActionListener(this);
+		aluDefault.addActionListener(this);
+		alulLarge.addActionListener(this);
+		alulGiant.addActionListener(this);
+		graphiteDefault.addActionListener(this);
+		graphitelLarge.addActionListener(this);
+		graphiteGiant.addActionListener(this);
+		acrylDefault.addActionListener(this);
+		acrylLarge.addActionListener(this);
+		acrylGiant.addActionListener(this);
 
 		// Set up a tabbed pane system
 		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -138,7 +174,7 @@ public class MainGUI extends JFrame implements ActionListener {
 
 		// Set up the tabs, passing in the relevant data structures
 		supplierTab = new SupplierTab(driver);
-		staffTab = new StaffTab(driver);
+		staffTab = new StaffTab(currentlyLoggedInStaff, driver);
 		stockControlTab = new StockControlTab(driver);
 		customerOrderTab = new CustomerOrderTab(currentlyLoggedInStaff, driver);
 		customerTab = new CustomerTab(driver);
@@ -146,7 +182,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		customerOrderHistorytab = new CustomerOrderHistoryTab(driver);
 		supplyOrderHistorytab = new SupplyOrderHistoryTab(driver);
 		supplyOrderTab = new SupplyOrderTab(currentlyLoggedInStaff, driver);
-		// accountingTab = new AccountingTab(driver);
+		accountingTab = new AccountingTab(driver);
 
 		// Add the tabs to the pane
 		tabbedPane.addTab("Customer", new ImageIcon("Images/CustomerIcon.jpg"), customerTab,
@@ -168,22 +204,31 @@ public class MainGUI extends JFrame implements ActionListener {
 				"Select this tab to show customer order.");
 		customerOrderTabbedPane.addTab("Customer Order History", null, customerOrderHistorytab,
 				"Select this tab to show customer order history.");
-		tabbedPane
-				.addTab("Customer Order", new ImageIcon("Images/CustomerOrderIcon.jpg"),
-						customerOrderTabbedPane,
-						"Select this tab to view details on orders for customers.");
+		tabbedPane.addTab("Customer Order", new ImageIcon("Images/CustomerOrderIcon.jpg"),
+				customerOrderTabbedPane, null);
 		tabbedPane.addTab("Supply Order", new ImageIcon("Images/SupplyOrderIcon.jpg"),
-				supplyOrderTabbedPane, "Select this tab to view details on orders from suppliers.");
+				supplyOrderTabbedPane, null);
+		tabbedPane
+				.addTab("Accounting", new ImageIcon("Images/accounting.png"), accountingTab, null);
 
 		// Add tool tips to menu items
-		fileMenu.setToolTipText("<html>This is the file menu.<br/> Click to open previous files, or to save current progress.</html>");
-		userMenu.setToolTipText("<html>This is the user menu.<br/> Click to logout, or to exit the program.</html>");
-		helpMenu.setToolTipText("<html>This is the help menu.<br/> Click to access the user guide.</html>");
+		/*
+		 * fileMenu.setToolTipText(
+		 * "<html>This is the file menu.<br/> Click to open previous files, or to save current progress.</html>"
+		 * ); settingsMenu.setToolTipText(
+		 * "<html>This is the user menu.<br/> Click to logout, or to exit the program.</html>");
+		 * helpMenu
+		 * .setToolTipText("<html>This is the help menu.<br/> Click to access the user guide.</html>"
+		 * );
+		 */
 
 		setVisible(true);
 	}
 
-	/** Action events for the different menu items */
+	// Action events for the different menu items
+	// Note: It's bad practice to do action listeners in this way, even though
+	// it
+	// shortens the code.
 	@Override
 	public void actionPerformed(ActionEvent event) {
 
@@ -196,6 +241,7 @@ public class MainGUI extends JFrame implements ActionListener {
 			if (answer == JOptionPane.YES_OPTION) {
 				System.exit(0);
 			}
+			System.out.println("Terminate Program!");
 		}
 
 		// Logout option
@@ -233,6 +279,34 @@ public class MainGUI extends JFrame implements ActionListener {
 				e.printStackTrace();
 			}
 		}
+		if (event.getSource() == acrylDefault) {
+			driver.setLookAndFeel(1, "Small-Font");
+		}
+		else if (event.getSource() == acrylLarge) {
+			driver.setLookAndFeel(1, "Large-Font");
+		}
+		else if (event.getSource() == acrylGiant) {
+			driver.setLookAndFeel(1, "Giant-Font");
+		}
+		else if (event.getSource() == graphiteDefault) {
+			driver.setLookAndFeel(2, "Green-Small-Font");
+		}
+		else if (event.getSource() == graphitelLarge) {
+			driver.setLookAndFeel(2, "Green-Medium-Font");
+		}
+		else if (event.getSource() == graphiteGiant) {
+			driver.setLookAndFeel(2, "Green-Large-Font");
+		}
+		else if (event.getSource() == aluDefault) {
+			driver.setLookAndFeel(3, "Small-Font");
+		}
+		else if (event.getSource() == alulLarge) {
+			driver.setLookAndFeel(3, "Large-Font");
+		}
+		else if (event.getSource() == alulGiant) {
+			driver.setLookAndFeel(3, "Giant-Font");
+		}
+
 		// About option
 		if (event.getActionCommand().equals("Open")) {
 			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
@@ -243,12 +317,7 @@ public class MainGUI extends JFrame implements ActionListener {
 		// Save option
 		if (event.getActionCommand().equals("Save")) {
 			if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
-				String str = "ERFERERERE";
-				/*
-				 * try(FileWriter fw = new FileWriter(fileChooser.getSelectedFile()+".txt")) {
-				 * fw.write(sb.toString()); } catch (IOException e) { // Auto-generated catch block
-				 * e.printStackTrace(); } file = fileChooser.getSelectedFile();
-				 */
+
 				stringBuilder = new StringBuilder();
 				productTab.buildProductDetailsString(driver.getStockDB().getStockList());
 
@@ -332,6 +401,18 @@ public class MainGUI extends JFrame implements ActionListener {
 
 	public SupplyOrderHistoryTab getSupplyOrderHistorytab() {
 		return supplyOrderHistorytab;
+	}
+
+	public SupplyOrderTab getSupplyOrderTab() {
+		return supplyOrderTab;
+	}
+
+	public AccountingTab getAccountingTab() {
+		return accountingTab;
+	}
+
+	public JTabbedPane getSupplyOrderTabbedPane() {
+		return supplyOrderTabbedPane;
 	}
 
 	public JTabbedPane getCustomerOrderTabbedPane() {

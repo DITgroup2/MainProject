@@ -1,5 +1,7 @@
-Tests
-guiTabs
-order
-person
-retailSystem
+com.dit.group2.graphs
+com.dit.group2.gui
+com.dit.group2.order
+com.dit.group2.person
+com.dit.group2.retailSystem
+com.dit.group2.stock
+com.dit.group2.tests

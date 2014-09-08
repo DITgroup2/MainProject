@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -12,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 @SuppressWarnings("serial")
-public class GuiLayout extends JPanel implements ComponentListener{
+public class GuiLayout extends JPanel implements ComponentListener, MouseListener{
 	
 	protected JPanel mainPanel,outerPanel;
 	protected int xSize;
@@ -60,4 +62,19 @@ public class GuiLayout extends JPanel implements ComponentListener{
 
 	@Override
 	public void componentMoved(ComponentEvent e) {}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {}
+
+	@Override
+	public void mouseExited(MouseEvent e) {}
+
+	@Override
+	public void mousePressed(MouseEvent e) {}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {}
 }

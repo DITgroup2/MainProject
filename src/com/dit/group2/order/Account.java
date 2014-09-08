@@ -31,6 +31,10 @@ public class Account {
 	private double thirdquarter2012;
 	private double fourthquarter2012;
 
+	private int expenses;
+	private int rent;
+	private int wages;
+
 	/**
 	 * Accounting constructor
 	 */
@@ -41,16 +45,10 @@ public class Account {
 		this.supplyOrderList = supplyOrderList;
 	}
 
-	/**
-	 * @param e
-	 */
 	// public void add(SupplyOrder e) {
 	// supplyOrderList.add(e);
 	// }
 
-	/**
-	 * @param e
-	 */
 	// public void add(PurchaseOrder e) {
 	// purchaseOrderList.add(e);
 	// }
@@ -114,62 +112,50 @@ public class Account {
 		int month = cal.get(Calendar.MONTH);
 		double total = 0.0;
 		if (year == 2014 && ((month >= 0) && (month < 3))) {
-			System.out.println("1st quarter " + year);
 			total += monthlytotal;
 			setFirstquarter2014(total);
 		}
 		if (year == 2014 && ((month >= 3) && (month <= 5))) {
-			System.out.println("2nd Quarter " + year);
 			total += monthlytotal;
 			setSecondquarter2014(total);
 		}
 		if (year == 2014 && ((month >= 6) && (month <= 8))) {
-			System.out.println("3rd Quarter " + year);
 			total += monthlytotal;
 			setThirdquarter2014(total);
 		}
 		if (year == 2014 && ((month >= 9) && (month <= 11))) {
-			System.out.println("4th Quarter " + year);
 			total += monthlytotal;
 			setFourthquarter2014(total);
 		}
 		if (year == 2013 && ((month >= 0) && (month < 3))) {
-			System.out.println("1st quarter " + year);
 			total += monthlytotal;
 			setFirstquarter2013(total);
 		}
 		if (year == 2013 && ((month >= 3) && (month <= 5))) {
-			System.out.println("2nd Quarter " + year);
 			total += monthlytotal;
 			setSecondquarter2013(total);
 		}
 		if (year == 2013 && ((month >= 6) && (month <= 8))) {
-			System.out.println("3rd Quarter " + year);
 			total += monthlytotal;
 			setThirdquarter2013(total);
 		}
 		if (year == 2013 && ((month >= 9) && (month <= 11))) {
-			System.out.println("4th Quarter " + year);
 			total += monthlytotal;
 			setFourthquarter2013(total);
 		}
 		if (year == 2012 && ((month >= 0) && (month < 3))) {
-			System.out.println("1st quarter " + year);
 			total += monthlytotal;
 			setFirstquarter2012(total);
 		}
 		if (year == 2012 && ((month >= 3) && (month <= 5))) {
-			System.out.println("2nd Quarter " + year);
 			total += monthlytotal;
 			setSecondquarter2012(total);
 		}
 		if (year == 2012 && ((month >= 6) && (month <= 8))) {
-			System.out.println("3rd Quarter " + year);
 			total += monthlytotal;
 			setThirdquarter2012(total);
 		}
 		if (year == 2012 && ((month >= 9) && (month <= 11))) {
-			System.out.println("4th Quarter of " + year);
 			total += monthlytotal;
 			setFourthquarter2012(total);
 		}
@@ -293,6 +279,30 @@ public class Account {
 
 	public void setTotalPurchases(double totalPurchases) {
 		this.totalPurchases = totalPurchases;
+	}
+
+	public int getExpenses() {
+		return expenses;
+	}
+
+	public void setExpenses(int expenses) {
+		this.expenses = expenses;
+	}
+
+	public int getRent() {
+		return rent;
+	}
+
+	public void setRent(int rent) {
+		this.rent = rent;
+	}
+
+	public int getWages() {
+		return wages;
+	}
+
+	public void setWages(int wages) {
+		this.wages = wages;
 	}
 
 }

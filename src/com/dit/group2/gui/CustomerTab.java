@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -24,7 +23,7 @@ import com.dit.group2.stock.StockItem;
  * Tab containing customer operations
  */
 @SuppressWarnings("serial")
-public class CustomerTab extends PersonTab implements MouseListener {
+public class CustomerTab extends PersonTab {
 
 	private RetailSystemDriver driver;
 	private JButton newCustomerButton;
@@ -37,8 +36,8 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	/**
 	 * Customer tab constructor
 	 * 
-	 * @param personDB
-	 *            The database for people
+	 * @param driver
+	 *            The database for the system
 	 */
 	public CustomerTab(RetailSystemDriver driver) {
 		super(driver);
@@ -70,7 +69,6 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		cancelEditButton.setToolTipText("Click to cancel editing the current customer.");
 		cancelButton.setToolTipText("Click to exit the new customer screen.");
 		submitButton.setToolTipText("Submit changes/new customer.");
-		// Set tool tips for combobox items
 		comboBox.setToolTipText("Click to view the details of another customer.");
 
 		setTextField(0, driver.getPersonDB().getCustomerList());
@@ -84,14 +82,18 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	public void addItemsToOrderCombobox() {
 		orderComboboxItems.clear();
 		String item = "";
-
-		for (Order order : driver.getOrderDB().getCustomerOrderList()) {
-			if (order.getPerson() == person) {
-				item = "ID:\t" + order.getId() + " \t " + "Date: " + order.getDate() + "";
-				orderComboboxItems.add(item);
+		if (driver.getPersonDB().getCustomerList().size() > 0) {
+			for (Order order : driver.getOrderDB().getCustomerOrderList()) {
+				if (order.getPerson() == person) {
+					item = "ID:\t" + order.getId() + " \t " + "Date: " + order.getDateString() + "";
+					orderComboboxItems.add(item);
+				}
 			}
+			orderComboBox.setSelectedIndex(orderComboBox.getItemCount() - 1);
 		}
-		orderComboBox.setSelectedIndex(orderComboBox.getItemCount() - 1);
+		else {
+			orderComboBox.setSelectedItem(null);
+		}
 
 		revalidate();
 		repaint();
@@ -124,7 +126,8 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	 * @param order
 	 */
 	private void showOrderDetails(Order order) {
-		String orderDetailsMessage = "ORDER DATE : " + order.getDate();
+
+		String orderDetailsMessage = "ORDER DATE : " + order.getDateString();
 
 		orderDetailsMessage += "\nItems in this order: ";
 		for (StockItem stockItem : order.getOrderEntryList()) {
@@ -219,9 +222,11 @@ public class CustomerTab extends PersonTab implements MouseListener {
 				// If all details entered are valid
 				if (valid) {
 					contactNumberLabel.setForeground(Color.black);
-					driver.getPersonDB().getCustomerList();
-					driver.getGui().getTabbedPane().setSelectedComponent(
-							driver.getGui().getCustomerOrderTabbedPane());
+					// ;
+					if (driver.getPersonDB().getCustomerList().size() > 0) {
+						driver.getGui().getTabbedPane().setSelectedComponent(
+								driver.getGui().getCustomerOrderTabbedPane());
+					}
 					driver.getGui().getCustomerOrderTab().fillUpCustomerComboBox();
 					driver.getGui().getCustomerOrderTab().getCustomerComboBox().setSelectedIndex(
 							driver.getPersonDB().getCustomerList().size());
@@ -277,6 +282,7 @@ public class CustomerTab extends PersonTab implements MouseListener {
 		}
 		// Delete button clicked
 		if (e.getSource() == deletePersonButton) {
+			// orderComboBox.setSelectedItem(null);
 			deletePerson(person, driver.getPersonDB().getCustomerList());
 			driver.getGui().getCustomerOrderTab().fillUpCustomerComboBox();
 			validate();
@@ -295,7 +301,7 @@ public class CustomerTab extends PersonTab implements MouseListener {
 	/**
 	 * Display the order details
 	 * 
-	 * @param order
+	 * @param event
 	 */
 	@Override
 	public void itemStateChanged(ItemEvent event) {
@@ -313,7 +319,7 @@ public class CustomerTab extends PersonTab implements MouseListener {
 
 				if (values != null && !automaticItemSelection) {
 					showOrderDetails(driver.getOrderDB().getOrderById(
-							getIndex(driver.getPersonDB().getCustomerList()),
+							Integer.parseInt(values[1].trim()),
 							driver.getOrderDB().getCustomerOrderList()));
 				}
 			}

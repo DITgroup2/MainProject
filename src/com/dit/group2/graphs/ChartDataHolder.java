@@ -4,11 +4,15 @@ public class ChartDataHolder {
 
 	private double sales;
 
+	
+	
 	public ChartDataHolder() {
-
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	public ChartDataHolder(double sales) {
+		super();
 		this.sales = sales;
 	}
 
@@ -19,4 +23,7 @@ public class ChartDataHolder {
 	public void setSales(double sales) {
 		this.sales = sales;
 	}
+
+	
+	
 }

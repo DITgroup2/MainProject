@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -24,7 +22,7 @@ import com.dit.group2.person.Person;
 import com.dit.group2.retailSystem.RetailSystemDriver;
 
 @SuppressWarnings("serial")
-public class PersonTab extends GuiLayout implements ActionListener, ItemListener, MouseListener {
+public class PersonTab extends GuiLayout implements ActionListener, ItemListener {
 
 	protected RetailSystemDriver driver;
 	protected boolean editMode;
@@ -49,8 +47,8 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 	/**
 	 * Person tab comment
 	 * 
-	 * @param personDB
-	 *            Database for people
+	 * @param driver
+	 *            Database for the system
 	 */
 	public PersonTab(RetailSystemDriver driver) {
 		super();
@@ -404,12 +402,11 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 				deletePersonButton.setEnabled(true);
 				editPersonButton.setEnabled(true);
 			}
-
-			idLabel.setForeground(Color.black);
-			nameLabel.setForeground(Color.black);
 			emailLabel.setForeground(Color.black);
+			nameLabel.setForeground(Color.black);
 			contactNumberLabel.setForeground(Color.black);
 			addressLabel.setForeground(Color.black);
+
 		}
 		// Cancel button clicked in edit mode
 		if (e.getSource() == cancelEditButton) {
@@ -420,10 +417,8 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 			editPersonButton.setEnabled(true);
 			editPersonButton.setVisible(true);
 			comboBox.setEnabled(true);
-
-			idLabel.setForeground(Color.black);
-			nameLabel.setForeground(Color.black);
 			emailLabel.setForeground(Color.black);
+			nameLabel.setForeground(Color.black);
 			contactNumberLabel.setForeground(Color.black);
 			addressLabel.setForeground(Color.black);
 		}
@@ -434,25 +429,5 @@ public class PersonTab extends GuiLayout implements ActionListener, ItemListener
 
 	@Override
 	public void itemStateChanged(ItemEvent arg0) {
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent arg0) {
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent arg0) {
-	}
-
-	@Override
-	public void mouseExited(MouseEvent arg0) {
-	}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent arg0) {
 	}
 }

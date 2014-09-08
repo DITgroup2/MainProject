@@ -6,7 +6,7 @@ package com.dit.group2.person;
  */
 public class Person {
 	
-	private static int uniqueId = 1;
+	private static int uniqueId = 0;
 	
 	private int id;
 	private String name;

@@ -149,7 +149,7 @@ public class Product {
 	public void setProfitMargin(double profitMargin) {
 		this.profitMargin = profitMargin;
 		// upgrade retail price according to change in profit margin
-		retailPrice = supplierPrice*(1+profitMargin); 
+		retailPrice = supplierPrice+(supplierPrice*profitMargin); 
 	}
 
 

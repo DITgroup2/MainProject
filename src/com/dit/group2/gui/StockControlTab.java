@@ -1,7 +1,11 @@
 package com.dit.group2.gui;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
@@ -9,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -17,9 +23,9 @@ import com.dit.group2.stock.Product;
 import com.dit.group2.stock.StockItem;
 
 @SuppressWarnings("serial")
-public class StockControlTab extends GuiLayout implements ListSelectionListener {
+public class StockControlTab extends GuiLayout implements ListSelectionListener, MouseMotionListener {
 
-	private RetailSystemDriver driver;
+	private final RetailSystemDriver driver;
 
 	protected JLabel productIdLabel;
 	protected JLabel productNameLabel;
@@ -28,10 +34,12 @@ public class StockControlTab extends GuiLayout implements ListSelectionListener 
 
 	protected DefaultListModel<String> listModel = new DefaultListModel<String>();
 	protected JList<String> stockList = new JList<String>(listModel);
+	
+	
 	protected JScrollPane stockListSroll = new JScrollPane(stockList);
 
 	private TabListCellRenderer renderer = new TabListCellRenderer(true);
-
+	
 	// source for this class:
 	// http://www.grandt.com/sbe/files/uts2/Chapter10html/Chapter10.htm
 
@@ -55,6 +63,7 @@ public class StockControlTab extends GuiLayout implements ListSelectionListener 
 		super();
 		this.driver = driver;
 
+		ToolTipManager.sharedInstance().registerComponent(stockList);
 		titleLabel.setText("Stock List");
 		add(outerPanel, new GridBagConstraints());
 		addComponentListener(this);
@@ -87,23 +96,44 @@ public class StockControlTab extends GuiLayout implements ListSelectionListener 
 		add(titleLabel);
 		renderer.setTabs(new int[] { 70, 300, 400 });
 		stockList.setCellRenderer(renderer);
+		stockList.addMouseListener(this);
 		setLayout(null);
 		setVisible(true);
 		refreshStockControlTab();
+		
+		// Attach a mouse motion adapter to let us know the mouse is over an item and to show the tip.
+		stockList.addMouseMotionListener(this);
 	}
+	
+
+    public void mouseMoved( MouseEvent e) {
+        int index = stockList.locationToIndex(e.getPoint());
+        if (index > -1) {
+        	stockList.setToolTipText(null);
+        	String[] values = ((String)listModel.getElementAt(index)).split("\\t");
+        	Product product = driver.getStockDB().getStockItem(Integer.parseInt(values[0].trim())).getProduct();
+        	String text = "<html>PRODUCT DETAILS:<br/> Supplier: "+product.getSupplier().getName()
+        			+"<br/>Supplier Price: "+product.getSupplierPrice()+"<br/> Retail Price: "+product.getRetailPrice()
+        			+"<br/><br/>CLICK TO EDIT PRODUCT DETAILS</html>";
+        	
+            stockList.setToolTipText(text);
+        }
+    }
+    
 
 	public void setStockList(ArrayList<StockItem> list) {
-		int index = 0;
 		listModel.clear();
 		for (StockItem stockItem : list) {
 			Product product = stockItem.getProduct();
 			listModel.addElement(textAlignment("   " + product.getProductID(), product
 					.getProductName(), "" + stockItem.getQuantity(), product.getProductCategory()));
 			// stockList.setSelectedIndex(orderListIndex);
-			index++;
 		}
 	}
 
+	/**
+	 * Refresh stock list
+	 */
 	public void refreshStockControlTab() {
 		setStockList(driver.getStockDB().getStockList());
 	}
@@ -118,8 +148,16 @@ public class StockControlTab extends GuiLayout implements ListSelectionListener 
 			if (stockList.getSelectedIndex() > -1) {
 				// separate the text in the selected list item
 				String[] values = stockList.getSelectedValue().split("\\t");
-				JOptionPane.showMessageDialog(null, values[1]);
+				driver.getGui().getTabbedPane().setSelectedComponent(driver.getGui().getProductTab());
+				
+				driver.getGui().getProductTab().setSelectedProduct(
+						driver.getStockDB().getStockItem(Integer.parseInt(values[0].trim())));
+				
+				
 			}
 		}
 	}
+	
+	@Override
+	public void mouseDragged(MouseEvent arg0) {}
 }

@@ -1,17 +1,23 @@
 package com.dit.group2.retailSystem;
 
-import java.util.Properties;
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import com.dit.group2.gui.MainGUI;
+import com.dit.group2.order.Order;
 import com.dit.group2.order.OrderDB;
+import com.dit.group2.person.Customer;
+import com.dit.group2.person.Person;
 import com.dit.group2.person.PersonDB;
 import com.dit.group2.stock.Product;
 import com.dit.group2.stock.StockDB;
+import com.dit.group2.stock.StockItem;
 
 public class RetailSystemDriver {
 
@@ -23,9 +29,11 @@ public class RetailSystemDriver {
 	private static boolean hasAccessLevelSet;
 	private static boolean priviledged;
 	private Product product;
+	private ArrayList<StockItem> orderStockItemList;
+	private ArrayList<ArrayList<Product>> productList;
+	private double grandTotal;
+	private Random random;
 
-	// The shortest Irish phone number code is 8 digits, yet this is not accepted.
-	// (eg 096 12345)Should have unlimited upper bound. Dublin numbers not accepted!!!
 	private static String contactNumPattern = "^[0].[0-9]{6,10}$";
 	private static String accessLevelPattern = "^[1-2]$";
 	private static String emailPattern = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
@@ -89,7 +97,7 @@ public class RetailSystemDriver {
 	}
 
 	/**
-	 * @return the gui
+	 * @param gui
 	 */
 	public void setGui(MainGUI gui) {
 		this.gui = gui;
@@ -112,20 +120,15 @@ public class RetailSystemDriver {
 
 		orderDB = new OrderDB();
 		stockDB = new StockDB();
-
+		random = new Random();
+		grandTotal = 0;
 		automaticallyCreateProducts();
+		automaticallyCreateOrders();
 
 		// Look and feel template
 		try {
-			Properties props = new Properties();
-
-			props.put("rolloverColor", "218 254 230");
-			props.put("rolloverColorLight", "218 254 230");
-			props.put("rolloverColorDark", "180 240 197");
-
 			com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme("Large-Font",
 					"INSERT YOUR LICENSE KEY HERE", "DIT");
-			// SmartLookAndFeel.setCurrentTheme(props);
 			UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
 		}
 		catch (ClassNotFoundException e) {
@@ -140,8 +143,80 @@ public class RetailSystemDriver {
 		catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}
+
 		login = new Login(this);
 		gui = new MainGUI();
+		// setLookAndFeel(3,"Large-Font");
+	}
+
+	public void setLookAndFeel(int theme, String fontSize) {
+
+		switch (theme) {
+			case 1:
+				try {
+					com.jtattoo.plaf.noire.NoireLookAndFeel.setTheme(fontSize,
+							"INSERT YOUR LICENSE KEY HERE", "DIT");
+					UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
+
+				}
+				catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch (InstantiationException e) {
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				catch (UnsupportedLookAndFeelException e) {
+					e.printStackTrace();
+				}
+				break;
+			case 2:
+				try {
+					com.jtattoo.plaf.graphite.GraphiteLookAndFeel.setTheme(fontSize,
+							"INSERT YOUR LICENSE KEY HERE", "DIT");
+					UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
+				}
+				catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch (InstantiationException e) {
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				catch (UnsupportedLookAndFeelException e) {
+					e.printStackTrace();
+				}
+				break;
+			case 3:
+				try {
+					com.jtattoo.plaf.aluminium.AluminiumLookAndFeel.setTheme(fontSize,
+							"INSERT YOUR LICENSE KEY HERE", "DIT");
+					UIManager.setLookAndFeel("com.jtattoo.plaf.aluminium.AluminiumLookAndFeel");
+				}
+				catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch (InstantiationException e) {
+					e.printStackTrace();
+				}
+				catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+				catch (UnsupportedLookAndFeelException e) {
+					e.printStackTrace();
+				}
+				break;
+			default:
+				break;
+
+		}
+		SwingUtilities.updateComponentTreeUI(gui);
+		SwingUtilities.updateComponentTreeUI(login);
+
 	}
 
 	private void automaticallyCreateProducts() {
@@ -149,23 +224,23 @@ public class RetailSystemDriver {
 		product = new Product(
 				"Asus EeeePC 1015px",
 				"Atom N570 / 1.66 GHz - Windows 7 Starter - 1 GB RAM - 250 GB HDD - 10.1 inches wide 1024 x 600 - Intel GMA 3150 - black Series",
-				"Laptop", 200, .2, personDB.getRandomSupplier());
+				"Laptop", 200, .2, personDB.getSupplierByName("Good Buy"));
 		stockDB.addNewProductToStockList(product, 22);
 		product = new Product(
 				"Apple MacBook Pro",
 				"2.0GHz Intel Core i7 - 4 GB RAM - 1,280x800-pixel 15inches display - 500 GB SSD - OSX 10.9.3 Mawericks",
-				"Laptop", 1000, .2, personDB.getRandomSupplier());
+				"Laptop", 1000, .2, personDB.getSupplierByName("Better Buy"));
 		stockDB.addNewProductToStockList(product, 5);
 		product = new Product(
 				"HP Chromebook 11",
 				"1.7 GHz Samsung Exynos 5250 - 2GB RAM - 11.6 inches 1366 x 768 display - ARM Mali-T604 Graphics - 16GB SSD - Google Chrome OS",
-				"Laptop", 350, .2, personDB.getRandomSupplier());
+				"Laptop", 350, .2, personDB.getSupplierByName("Poor Buy"));
 		stockDB.addNewProductToStockList(product, 8);
 
 		product = new Product(
 				"Apple iPad mini",
 				"Battery Life:6 hours 8 minutes Bluetooth Version:4.0 Camera Resolution:1.2MP Front; 5MP Rear Cellular Technology :CDMA 1X EDGE EV-DO EV-DO Rev A GSM HSDPA HSPA HSPA+ LTE UMTS CPU:Apple A7 Dimensions:7.87 x 5.3 x 0.29 (HWD) inches Operating System:Apple iOS Ports:Apple Lightning Screen Pixels Per Inch:326 Screen Resolution:2048 x 1536 pixels Screen Size:7.9 inches Screen Type:Retina Service Provider:AT&T Sprint T-Mobile Verizon Wireless Storage Capacity (as Tested):16 GB Storage Type:SSD Touch Screen:Yes Video Camera Resolution:720p Front; 1080p Rear Weight:11.68 oz Wi-Fi (802.11x) Compatibility:2.4GHz/5GHz",
-				"Tablet", 400, .2, personDB.getRandomSupplier());
+				"Tablet", 400, .2, personDB.getSupplierByName("Best Buy"));
 		stockDB.addNewProductToStockList(product, 7);
 		product = new Product(
 				"Amazon Kindle Fire HDX",
@@ -173,7 +248,7 @@ public class RetailSystemDriver {
 				"Tablet", 330, .2, personDB.getRandomSupplier());
 		stockDB.addNewProductToStockList(product, 12);
 		product = new Product(
-				"Samsung Galaxy Note ",
+				"Samsung Galaxy Note",
 				"Additional Storage:MicroSD Battery Life:31 minutes 7 hours Battery Size:8220 mAh Bluetooth Version:4.0 Camera Resolution:8-megapixel Rear-Facing; 2-megapixel Front CPU:Samsung Exynos 5420 Dimensions:9.57 x 6.75 x 0.31 inches GPS:Yes Operating System:Google Android 4.3 Ports:MHL micro USB Processor Speed:1.9 GHz RAM:3 GB Screen Pixels Per Inch:298 ppi Screen Resolution:2560 x 1600 pixels Screen Size:10.1 inches Screen Type:IPS LCD Storage Capacity (as Tested):16 GB Storage Type:SSD Video Camera Resolution:1080p; 720p Weight:19.75 oz Wi-Fi (802.11x) Compatibility:2.4GHz/5GHz",
 				"Tablet", 450, .2, personDB.getRandomSupplier());
 		stockDB.addNewProductToStockList(product, 10);
@@ -210,6 +285,79 @@ public class RetailSystemDriver {
 				"Smartphone", 220, .2, personDB.getRandomSupplier());
 		stockDB.addNewProductToStockList(product, 6);
 		// }
+	}
+
+	private ArrayList<StockItem> getRandomOrderItemList(boolean customerOrderMode) {
+		boolean selected[] = new boolean[getStockDB().getStockList().size()];
+		for (int i = 0; i < selected.length; i++)
+			selected[i] = false;
+
+		orderStockItemList = new ArrayList<StockItem>();
+		grandTotal = 0;
+
+		for (int i = 0; i < random.nextInt((10 - 1) + 1) + 3; i++) {
+			Product randomProduct = getStockDB().getRandomProduct();
+			int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
+			if (!selected[randomProduct.getProductID() - 1]) {
+				selected[randomProduct.getProductID() - 1] = true;
+				orderStockItemList.add(new StockItem(randomProduct, randomQuantity));
+				if (customerOrderMode) {
+					grandTotal += (randomQuantity * randomProduct.getRetailPrice());
+				}
+				else
+					grandTotal += (randomQuantity * (randomProduct.getSupplierPrice()));
+			}
+		}
+		return orderStockItemList;
+	}
+
+	private void createSupplyProductList() {
+		productList = new ArrayList<ArrayList<Product>>();
+		ArrayList<Product> list;
+		for (Person supplier : getPersonDB().getSupplierList()) {
+			list = new ArrayList<Product>();
+			for (StockItem stockItem : getStockDB().getStockList()) {
+				Product product = stockItem.getProduct();
+				if (product.getSupplier().equals(supplier)) {
+					list.add(product);
+				}
+			}
+			productList.add(list);
+		}
+	}
+
+	private void automaticallyCreateCustomerOrders() {
+		// for (int i = 0; i < random.nextInt((10 - 5) + 1) + 5; i++) {
+		for (int i = 0; i < 16; i++) {
+			getOrderDB().getCustomerOrderList().add(
+					new Order(getPersonDB().getRandomStaff(), (Customer) getPersonDB()
+							.getRandomCustomer(), getRandomOrderItemList(true), grandTotal));
+		}
+	}
+
+	private void automaticallyCreateOrders() {
+
+		createSupplyProductList();
+		orderStockItemList = new ArrayList<StockItem>();
+		for (int i = 0; i < 308; i++) {
+			for (ArrayList<Product> list : productList) {
+				orderStockItemList = new ArrayList<StockItem>();
+				for (Product product : list) {
+					int randomQuantity = random.nextInt((10 - 1) + 1) + 1;
+					orderStockItemList.add(new StockItem(product, randomQuantity));
+				}
+				if (orderStockItemList.size() > 0)
+					getOrderDB().getSupplyOrderList().add(
+							new Order(getPersonDB().getRandomStaff(), orderStockItemList.get(
+									orderStockItemList.size() - 1).getProduct().getSupplier(),
+									orderStockItemList, grandTotal));
+				else
+					System.out.println("Empty List!!");
+			}
+			automaticallyCreateCustomerOrders();
+		}
+		grandTotal = 0;
+
 	}
 
 	public static void main(String args[]) {
